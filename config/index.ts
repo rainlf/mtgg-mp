@@ -1,5 +1,5 @@
 import { defineConfig, type UserConfigExport } from '@tarojs/cli'
-import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
+// import TsconfigPathsPlugin from 'tsconfig-paths-webpack-plugin'
 import devConfig from './dev'
 import prodConfig from './prod'
 
