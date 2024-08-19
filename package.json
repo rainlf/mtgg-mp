@@ -51,6 +51,7 @@
     "@tarojs/shared": "4.0.4",
     "@tarojs/taro": "4.0.4",
     "antd-mobile": "^5.37.1",
+    "antd-mobile-icons": "^0.3.0",
     "preact": "^10.5.15"
   },
   "devDependencies": {
