@@ -1,3 +1,14 @@
 {
-  "extends": ["taro/preact"]
+  "extends": ["taro/preact", "eslint:recommended", "plugin:react/recommended"],
+  "plugins": ["react"],
+  "settings": {
+    "react": {
+      "version": "detect",
+      "pragma": "h" // 指定 JSX 的别名
+    }
+  },
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "ract/jsx-curly-brace-presence": "off"
+  }
 }

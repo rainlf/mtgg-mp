@@ -1,0 +1,24 @@
+.loginContainer{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100vh;
+}
+
+.loginContainer{
+  .info {
+    height: 80%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .avatar {
+    margin-bottom: 20rpx;
+  }
+
+  .button {
+    height: 20%;
+  }
+}
