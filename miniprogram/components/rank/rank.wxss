@@ -60,7 +60,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 18rpx;
+    padding: 0 12rpx;
     border-radius: 12rpx;
     background: rgba(255, 255, 255, 0.62);
     box-sizing: border-box;
@@ -108,7 +108,7 @@
 }
 
 .panel-banner__worst-metric + .panel-banner__worst-metric {
-    margin-left: 18rpx;
+    margin-left: 10rpx;
 }
 
 .panel-banner__worst-metric {
@@ -124,7 +124,7 @@
 }
 
 .panel-banner__worst-label {
-    margin-left: 8rpx;
+    margin-left: 4rpx;
     font-size: 20rpx;
     color: #5e8f74;
 }
