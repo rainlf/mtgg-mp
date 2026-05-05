@@ -369,6 +369,17 @@
     line-height: 1.4;
 }
 
+.tag2-red {
+    background: rgba(255, 107, 107, 0.16);
+    color: #c43c3c;
+    font-size: 22rpx;
+    padding: 6rpx 14rpx;
+    margin-right: 10rpx;
+    margin-bottom: 10rpx;
+    border-radius: 999rpx;
+    line-height: 1.4;
+}
+
 .tag-more {
     background: rgba(93, 120, 149, 0.12);
     color: #5d7895;

@@ -85,7 +85,8 @@
                     <view class="tags-box">
                         <text wx:if="{{item.showNoBattleTag}}" class="tag tag-muted">未参战</text>
                         <block wx:for="{{item.displayTags}}" wx:key="index">
-                            <text wx:if="{{item === '一炮双响' || item === '一炮三响' || item === '相公'}}" class="tag2">{{item}}</text>
+                            <text wx:if="{{item === '一炮双响' || item === '一炮三响'}}" class="tag2-red">{{item}}</text>
+                            <text wx:elif="{{item === '相公'}}" class="tag2">{{item}}</text>
                             <text wx:else class="tag">{{item}}</text>
                         </block>
                         <text wx:if="{{item.canToggleTags}}" class="tag tag-more" catch:tap="toggleTags" data-id="{{item.id}}">{{item.isTagsExpanded ? '收起' : '+' + item.hiddenTagCount}}</text>

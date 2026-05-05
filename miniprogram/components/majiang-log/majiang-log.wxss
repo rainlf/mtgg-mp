@@ -363,7 +363,8 @@
 }
 
 .win-type,
-.win-type2 {
+.win-type2,
+.win-type3 {
     min-width: 92rpx;
     padding: 8rpx 18rpx;
     border-radius: 999rpx;
@@ -384,6 +385,12 @@
     color: #c46811;
     background: linear-gradient(180deg, rgba(255, 248, 231, 0.98) 0%, rgba(255, 228, 176, 0.98) 100%);
     border: 1rpx solid rgba(222, 164, 62, 0.18);
+}
+
+.win-type3 {
+    color: #c43c3c;
+    background: linear-gradient(180deg, rgba(255, 241, 241, 0.98) 0%, rgba(255, 220, 220, 0.98) 100%);
+    border: 1rpx solid rgba(228, 104, 104, 0.18);
 }
 
 .player-avatars {
@@ -527,6 +534,11 @@
     background: rgba(111, 179, 255, 0.12);
 }
 
+.special-red-tag {
+    color: #c43c3c;
+    background: rgba(255, 107, 107, 0.16);
+}
+
 .draw-tag {
     color: #2d5f98;
     background: rgba(74, 144, 226, 0.1);
@@ -595,7 +607,8 @@
     }
 
     .win-type,
-    .win-type2 {
+    .win-type2,
+    .win-type3 {
         min-width: 82rpx;
         padding: 8rpx 14rpx;
         font-size: 22rpx;

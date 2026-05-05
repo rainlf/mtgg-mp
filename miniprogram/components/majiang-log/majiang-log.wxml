@@ -89,7 +89,10 @@
                             </block>
                         </block>
                         <block wx:else>
-                            <block wx:if="{{item.type === '自摸' || item.type === '相公'}}">
+                            <block wx:if="{{item.type === '一炮双响' || item.type === '一炮三响'}}">
+                                <text class="win-type3">{{item.type}}</text>
+                            </block>
+                            <block wx:elif="{{item.type === '自摸' || item.type === '相公'}}">
                                 <text class="win-type2">{{item.type}}</text>
                             </block>
                             <block wx:else>
@@ -139,8 +142,8 @@
                             <view class="player-info">
                                 <text class="nickname">{{item.user.username}}</text>
                                 <view class="tags">
-                                    <block wx:for="{{item.tags}}" wx:key="tag">
-                                        <text class="tag win-tag">{{item}}</text>
+                                    <block wx:for="{{item.tags}}" wx:key="tag" wx:for-item="tagItem">
+                                        <text class="tag {{tagItem === '一炮双响' || tagItem === '一炮三响' ? 'special-red-tag' : 'win-tag'}}">{{tagItem}}</text>
                                     </block>
                                 </view>
                             </view>
@@ -158,7 +161,7 @@
                                 <text class="nickname">{{item.user.username}}</text>
                                 <view class="tags">
                                     <block wx:for="{{item.tags}}" wx:key="tag" wx:for-item="tagItem">
-                                        <text class="tag lose-tag">{{tagItem}}</text>
+                                        <text class="tag {{tagItem === '一炮双响' || tagItem === '一炮三响' ? 'special-red-tag' : 'lose-tag'}}">{{tagItem}}</text>
                                     </block>
                                 </view>
                             </view>
