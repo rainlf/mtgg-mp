@@ -115,7 +115,7 @@
         class="nav-btn nav-btn-history {{(showGameLog || showUserGameLog) ? 'nav-btn-active nav-btn-history-active' : ''}}"
         catch:tap="openGameLog"
       >
-        <text class="nav-btn-title">奖池&账本</text>
+        <text class="nav-btn-title">游戏记录</text>
       </view>
 
       <view
