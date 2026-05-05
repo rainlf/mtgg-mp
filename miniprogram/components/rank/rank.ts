@@ -65,7 +65,7 @@ Component({
           rankMetricLabel: '次',
           rankMetricPositive: true,
           fitnessCountText: String(item.fitnessCount || 0),
-          fitnessTitleText: `深蹲 ${item.fitnessCount || 0} 次`,
+          fitnessTitleText: `健身 ${item.fitnessCount || 0} 次`,
         }))
         self.setData({
           displayList: sortedList,

@@ -183,6 +183,9 @@ page {
 }
 
 .nav-btn-history {
+  flex: 1.35;
+  padding-left: 14rpx;
+  padding-right: 14rpx;
   background: linear-gradient(180deg, #f7f4ff 0%, #efebff 100%);
   border-color: rgba(132, 118, 230, 0.14);
 }

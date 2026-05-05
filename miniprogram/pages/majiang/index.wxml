@@ -105,17 +105,17 @@
       </view>
 
       <view
-        class="nav-btn nav-btn-history {{(showGameLog || showUserGameLog) ? 'nav-btn-active nav-btn-history-active' : ''}}"
-        catch:tap="openGameLog"
-      >
-        <text class="nav-btn-title">游戏历史</text>
-      </view>
-
-      <view
         class="nav-btn nav-btn-record {{showDrawer ? 'nav-btn-active nav-btn-record-active' : ''}}"
         catch:tap="openRecordGame"
       >
-        <text class="nav-btn-title">记录游戏</text>
+        <text class="nav-btn-title">麻将</text>
+      </view>
+
+      <view
+        class="nav-btn nav-btn-history {{(showGameLog || showUserGameLog) ? 'nav-btn-active nav-btn-history-active' : ''}}"
+        catch:tap="openGameLog"
+      >
+        <text class="nav-btn-title">奖池&账本</text>
       </view>
 
       <view
