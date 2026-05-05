@@ -494,6 +494,11 @@ page {
   color: #ff9f1a;
 }
 
+.squat-popup-tip-rest {
+  color: #ff9f1a;
+  font-weight: 700;
+}
+
 .squat-popup-footer {
   width: 100%;
   display: flex;

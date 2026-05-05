@@ -6,6 +6,7 @@ import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '..
 const SQUAT_DOWN_THRESHOLD = -0.14
 const SQUAT_UP_THRESHOLD = 0.14
 const SQUAT_MIN_ACTION_GAP = 900
+const SQUAT_MAX_COUNT = 100
 const SENSOR_UNSUPPORTED_ERROR = 'startAccelerometer:fail system permission denied'
 
 type SquatMotionState = 'idle' | 'down'
@@ -22,6 +23,14 @@ function resetSquatDetectorState() {
   squatLastCountTime = 0
   squatBaseY = null
   squatSmoothY = null
+}
+
+function getSquatStep(count: number) {
+  if (count < 10) return 1
+  if (count < 30) return 2
+  if (count < 70) return 3
+  if (count < SQUAT_MAX_COUNT) return 5
+  return SQUAT_MAX_COUNT
 }
 
 Page({
@@ -55,11 +64,12 @@ Page({
     isProfileSaving: false,
     showSquatPopup: false,
     squatCount: 11,
+    squatStep: 2,
     isSquatRedeeming: false,
     showSquatConfirm: false,
     squatConfirmCount: 11,
   },
-
+  
   onLoad() {
   },
 
@@ -358,6 +368,7 @@ Page({
     this.setData({
       showSquatPopup: true,
       squatCount: 11,
+      squatStep: getSquatStep(11),
       showDrawer: false,
       showProfileDrawer: false,
     }, () => {
@@ -379,6 +390,7 @@ Page({
     resetSquatDetectorState()
     this.setData({
       squatCount: 11,
+      squatStep: getSquatStep(11),
     })
   },
 
@@ -435,6 +447,7 @@ Page({
           showSquatPopup: false,
           squatConfirmCount: 11,
           squatCount: 11,
+          squatStep: getSquatStep(11),
         })
         wx.showToast({
           title: `已兑换 ${currentCount} 金币`,
@@ -459,6 +472,9 @@ Page({
 
   startSquatDetect() {
     if (squatSensorStarted) {
+      return
+    }
+    if (this.data.squatCount >= SQUAT_MAX_COUNT) {
       return
     }
 
@@ -486,9 +502,16 @@ Page({
       if (squatMotionState === 'down' && deltaY >= SQUAT_UP_THRESHOLD) {
         if (now - squatLastCountTime >= SQUAT_MIN_ACTION_GAP) {
           squatLastCountTime = now
+          const currentCount = this.data.squatCount
+          const step = getSquatStep(currentCount)
+          const nextCount = Math.min(SQUAT_MAX_COUNT, currentCount + step)
           this.setData({
-            squatCount: this.data.squatCount + 2,
+            squatCount: nextCount,
+            squatStep: getSquatStep(nextCount),
           })
+          if (nextCount >= SQUAT_MAX_COUNT) {
+            this.stopSquatDetect()
+          }
         }
         squatMotionState = 'idle'
       }
