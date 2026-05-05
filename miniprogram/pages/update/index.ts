@@ -1,5 +1,6 @@
 import { uploadUserInfo, updateUsername, getUserInfo } from '../../services/user-service'
 import { convertUserDTO } from '../../utils/util'
+import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
 Page({
   data: {
@@ -27,22 +28,28 @@ Page({
   },
 
   onNicknameInput(e: any) {
-    this.setData({ nickname: e.detail.value })
+    this.setData({ nickname: normalizeNicknameInput(e.detail.value) })
   },
 
   save() {
     const { user, nickname, avatarUrl, avatarChanged } = this.data
     if (!user || !user.id) return
+    const trimmedNickname = getTrimmedNickname(nickname)
+    const nicknameError = validateNickname(trimmedNickname)
+    if (nicknameError) {
+      wx.showToast({ title: nicknameError, icon: 'none' })
+      return
+    }
 
     wx.showLoading({ title: '保存中...' })
 
     let savePromise: Promise<any>
     if (avatarChanged && avatarUrl) {
       // 头像和昵称都更新
-      savePromise = uploadUserInfo(user.id, nickname, avatarUrl)
-    } else if (nickname !== (user.nickname || user.username || '')) {
+      savePromise = uploadUserInfo(user.id, trimmedNickname, avatarUrl)
+    } else if (trimmedNickname !== (user.nickname || user.username || '')) {
       // 只更新昵称
-      savePromise = updateUsername(user.id, nickname)
+      savePromise = updateUsername(user.id, trimmedNickname)
     } else {
       wx.hideLoading()
       wx.showToast({ title: '未做修改', icon: 'none' })
@@ -62,7 +69,7 @@ Page({
       .catch((err) => {
         wx.hideLoading()
         console.error('保存失败:', err)
-        wx.showToast({ title: '保存失败', icon: 'none' })
+        wx.showToast({ title: String(err || '保存失败'), icon: 'none' })
       })
   },
 

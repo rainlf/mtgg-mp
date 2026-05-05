@@ -13,8 +13,9 @@
         <input
           type="nickname"
           class="nickname-input"
-          placeholder="请输入昵称"
+          placeholder="请输入昵称，最多4字"
           placeholder-class="nickname-placeholder"
+          maxlength="4"
           bindinput="onNicknameInput"
           value="{{userInfo.nickName}}"
         />

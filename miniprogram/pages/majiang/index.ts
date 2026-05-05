@@ -1,6 +1,7 @@
 import { getUserInfo, getUserRank, updateUsername, uploadUserInfo } from '../../services/user-service'
 import { getGameList, getGameListByUser, cancelGame, getPrizePool, preloadMajiangPlayers } from '../../services/majiang-service'
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
+import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
 Page({
   data: {
@@ -332,7 +333,7 @@ Page({
 
   onProfileNicknameInput(e: any) {
     this.setData({
-      profileNickname: e.detail.value,
+      profileNickname: normalizeNicknameInput(e.detail.value),
     })
   },
 
@@ -340,9 +341,10 @@ Page({
     const { user, profileNickname, profileAvatarUrl, profileAvatarChanged, isProfileSaving } = this.data
     if (!user || !user.id || isProfileSaving) return
 
-    const trimmedNickname = (profileNickname || '').trim()
-    if (!trimmedNickname) {
-      wx.showToast({ title: '请输入昵称', icon: 'none' })
+    const trimmedNickname = getTrimmedNickname(profileNickname)
+    const nicknameError = validateNickname(trimmedNickname)
+    if (nicknameError) {
+      wx.showToast({ title: nicknameError, icon: 'none' })
       return
     }
 
@@ -378,7 +380,7 @@ Page({
         console.error('保存资料失败:', err)
         this.setData({ isProfileSaving: false })
         wx.hideLoading()
-        wx.showToast({ title: '保存失败', icon: 'none' })
+        wx.showToast({ title: String(err || '保存失败'), icon: 'none' })
       })
   },
 

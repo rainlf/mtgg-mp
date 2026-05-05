@@ -1,6 +1,7 @@
 import { uploadUserInfo } from '../../services/user-service'
 import { getUserInfo } from '../../services/user-service'
 import { convertUserDTO } from '../../utils/util'
+import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
 Page({
   data: {
@@ -28,10 +29,10 @@ Page({
   },
 
   onNicknameInput(e: any) {
-    const nickName = e.detail.value
+    const nickName = normalizeNicknameInput(e.detail.value)
     this.setData({
       'userInfo.nickName': nickName,
-      canLogin: !!this.data.userInfo.avatarUrl && !!nickName,
+      canLogin: !!this.data.userInfo.avatarUrl && !!getTrimmedNickname(nickName),
     })
   },
 
@@ -40,13 +41,19 @@ Page({
       wx.showToast({ title: '用户信息异常', icon: 'none' })
       return
     }
-    if (!this.data.userInfo.avatarUrl || !this.data.userInfo.nickName) {
+    const nickname = getTrimmedNickname(this.data.userInfo.nickName)
+    if (!this.data.userInfo.avatarUrl || !nickname) {
       wx.showToast({ title: '请选择头像和输入昵称', icon: 'none' })
+      return
+    }
+    const nicknameError = validateNickname(nickname)
+    if (nicknameError) {
+      wx.showToast({ title: nicknameError, icon: 'none' })
       return
     }
 
     wx.showLoading({ title: '提交中...' })
-    uploadUserInfo(this.data.user.id, this.data.userInfo.nickName, this.data.userInfo.avatarUrl)
+    uploadUserInfo(this.data.user.id, nickname, this.data.userInfo.avatarUrl)
       .then(() => {
         // 重新获取用户信息
         return getUserInfo(this.data.user.id)
@@ -60,7 +67,7 @@ Page({
       .catch((err) => {
         wx.hideLoading()
         console.error('登录失败:', err)
-        wx.showToast({ title: '提交失败', icon: 'none' })
+        wx.showToast({ title: String(err || '提交失败'), icon: 'none' })
       })
   },
 })

@@ -126,8 +126,9 @@
             <input
               type="nickname"
               class="profile-nickname-input"
-              placeholder="请输入昵称"
+              placeholder="请输入昵称，最多4字"
               placeholder-class="profile-nickname-placeholder"
+              maxlength="4"
               bindinput="onProfileNicknameInput"
               value="{{profileNickname}}"
             />
