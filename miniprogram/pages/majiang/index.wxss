@@ -481,6 +481,11 @@ page {
   text-align: center;
 }
 
+.squat-popup-tip-highlight {
+  color: #16a76c;
+  font-weight: 700;
+}
+
 .squat-popup-footer {
   width: 100%;
   display: flex;
@@ -510,4 +515,116 @@ page {
 
 .squat-popup-btn-disabled {
   opacity: 0.7;
+}
+
+.squat-confirm-container {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 14;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32rpx;
+  box-sizing: border-box;
+}
+
+.squat-confirm-mask {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: rgba(15, 23, 42, 0.56);
+}
+
+.squat-confirm {
+  position: relative;
+  width: 100%;
+  max-width: 622rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 32rpx 32rpx;
+  border-radius: 28rpx;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 250, 239, 0.99) 100%);
+  border: 1rpx solid rgba(255, 186, 73, 0.2);
+  box-shadow: 0 18rpx 48rpx rgba(88, 67, 24, 0.18);
+  box-sizing: border-box;
+}
+
+.squat-confirm-icon {
+  width: 88rpx;
+  height: 88rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ffe18d 0%, #ffb300 100%);
+  color: #fff;
+  font-size: 40rpx;
+  font-weight: 700;
+  box-shadow: 0 10rpx 24rpx rgba(255, 179, 0, 0.22);
+}
+
+.squat-confirm-title {
+  margin-top: 24rpx;
+  font-size: 34rpx;
+  font-weight: 700;
+  line-height: 1.5;
+  color: #3f4c39;
+  text-align: center;
+}
+
+.squat-confirm-amount {
+  color: #16a76c;
+}
+
+.squat-confirm-tip {
+  margin-top: 20rpx;
+  font-size: 26rpx;
+  line-height: 1.6;
+  color: #c88712;
+  text-align: center;
+}
+
+.squat-confirm-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  margin-top: 36rpx;
+}
+
+.squat-confirm-btn {
+  flex: 1;
+  min-height: 76rpx;
+  padding: 10rpx 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999rpx;
+  box-sizing: border-box;
+  font-size: 30rpx;
+  font-weight: 700;
+}
+
+.squat-confirm-btn + .squat-confirm-btn {
+  margin-left: 20rpx;
+}
+
+.squat-confirm-btn-cancel {
+  background: rgba(255, 179, 0, 0.08);
+  border: 1rpx solid rgba(255, 179, 0, 0.16);
+  color: #b47a0e;
+}
+
+.squat-confirm-btn-confirm {
+  background: linear-gradient(135deg, #7fe7c4 0%, #16c784 100%);
+  border: 1rpx solid rgba(20, 167, 108, 0.22);
+  color: #fff;
+  box-shadow: 0 8rpx 20rpx rgba(22, 199, 132, 0.2);
 }

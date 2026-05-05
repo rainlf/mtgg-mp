@@ -56,6 +56,8 @@ Page({
     showSquatPopup: false,
     squatCount: 1,
     isSquatRedeeming: false,
+    showSquatConfirm: false,
+    squatConfirmCount: 1,
   },
 
   onLoad() {
@@ -364,7 +366,7 @@ Page({
   },
 
   closeSquatPopup() {
-    if (this.data.isSquatRedeeming) {
+    if (this.data.isSquatRedeeming || this.data.showSquatConfirm) {
       return
     }
     this.setData({
@@ -396,6 +398,29 @@ Page({
     const currentCount = this.data.squatCount
     this.stopSquatDetect()
     this.setData({
+      showSquatConfirm: true,
+      squatConfirmCount: currentCount,
+    })
+  },
+
+  cancelSquatRedeem() {
+    if (this.data.isSquatRedeeming) {
+      return
+    }
+    this.setData({
+      showSquatConfirm: false,
+    })
+    if (this.data.showSquatPopup) {
+      this.startSquatDetect()
+    }
+  },
+
+  confirmSquatRedeem() {
+    if (this.data.isSquatRedeeming) {
+      return
+    }
+    const currentCount = this.data.squatConfirmCount
+    this.setData({
       isSquatRedeeming: true,
     })
 
@@ -406,7 +431,9 @@ Page({
       .then(() => {
         this.setData({
           isSquatRedeeming: false,
+          showSquatConfirm: false,
           showSquatPopup: false,
+          squatConfirmCount: 1,
           squatCount: 1,
         })
         wx.showToast({
