@@ -3,6 +3,27 @@ import { getGameList, getGameListByUser, cancelGame, getPrizePool, preloadMajian
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
+const SQUAT_DOWN_THRESHOLD = -0.14
+const SQUAT_UP_THRESHOLD = 0.14
+const SQUAT_MIN_ACTION_GAP = 900
+const SENSOR_UNSUPPORTED_ERROR = 'startAccelerometer:fail system permission denied'
+
+type SquatMotionState = 'idle' | 'down'
+
+let squatMotionState: SquatMotionState = 'idle'
+let squatLastCountTime = 0
+let squatBaseY: number | null = null
+let squatSmoothY: number | null = null
+let squatSensorStarted = false
+let squatAccelerometerHandler: WechatMiniprogram.OnAccelerometerChangeCallback | null = null
+
+function resetSquatDetectorState() {
+  squatMotionState = 'idle'
+  squatLastCountTime = 0
+  squatBaseY = null
+  squatSmoothY = null
+}
+
 Page({
   data: {
     user: {} as User,
@@ -32,6 +53,8 @@ Page({
     profileNickname: '',
     profileAvatarChanged: false,
     isProfileSaving: false,
+    showSquatPopup: false,
+    squatCount: 0,
   },
 
   onLoad() {
@@ -57,12 +80,22 @@ Page({
     })
   },
 
+  onHide() {
+    this.stopSquatDetect()
+  },
+
+  onUnload() {
+    this.stopSquatDetect()
+  },
+
   onPageRefresh() {
     this.setData({ isPageRefreshing: true })
     Promise.allSettled([this.fetchUserInfo(), this.fetchUserRank()]).finally(() => {
       this.setData({ isPageRefreshing: false })
     })
   },
+
+  noop() {},
 
   // 子组件下拉刷新触发
   handleRankListLoad() {
@@ -312,6 +345,114 @@ Page({
       profileAvatarChanged: false,
       showDrawer: false,
     })
+  },
+
+  openSquatPopup() {
+    if (this.data.showSquatPopup) {
+      return
+    }
+
+    this.setData({
+      showSquatPopup: true,
+      squatCount: 0,
+      showDrawer: false,
+      showProfileDrawer: false,
+    }, () => {
+      this.startSquatDetect()
+    })
+  },
+
+  closeSquatPopup() {
+    this.setData({
+      showSquatPopup: false,
+    })
+    this.stopSquatDetect()
+  },
+
+  resetSquatCount() {
+    resetSquatDetectorState()
+    this.setData({
+      squatCount: 0,
+    })
+  },
+
+  startSquatDetect() {
+    if (squatSensorStarted) {
+      return
+    }
+
+    resetSquatDetectorState()
+    squatAccelerometerHandler = (res) => {
+      if (!this.data.showSquatPopup) {
+        return
+      }
+
+      if (squatBaseY === null || squatSmoothY === null) {
+        squatBaseY = res.y
+        squatSmoothY = res.y
+        return
+      }
+
+      squatSmoothY = squatSmoothY * 0.82 + res.y * 0.18
+      const deltaY = squatSmoothY - squatBaseY
+      const now = Date.now()
+
+      if (squatMotionState === 'idle' && deltaY <= SQUAT_DOWN_THRESHOLD) {
+        squatMotionState = 'down'
+        return
+      }
+
+      if (squatMotionState === 'down' && deltaY >= SQUAT_UP_THRESHOLD) {
+        if (now - squatLastCountTime >= SQUAT_MIN_ACTION_GAP) {
+          squatLastCountTime = now
+          this.setData({
+            squatCount: this.data.squatCount + 1,
+          })
+        }
+        squatMotionState = 'idle'
+      }
+    }
+
+    wx.startAccelerometer({
+      interval: 'game',
+      success: () => {
+        squatSensorStarted = true
+        if (squatAccelerometerHandler) {
+          wx.onAccelerometerChange(squatAccelerometerHandler)
+        }
+      },
+      fail: (err) => {
+        console.error('[Squat] 启动加速度计失败:', err)
+        resetSquatDetectorState()
+        squatSensorStarted = false
+        squatAccelerometerHandler = null
+        this.setData({
+          showSquatPopup: false,
+        })
+        wx.showToast({
+          title: err && err.errMsg === SENSOR_UNSUPPORTED_ERROR ? '当前设备不支持' : '启动传感器失败',
+          icon: 'none',
+        })
+      },
+    })
+  },
+
+  stopSquatDetect() {
+    if (squatAccelerometerHandler) {
+      wx.offAccelerometerChange(squatAccelerometerHandler)
+    }
+
+    if (squatSensorStarted) {
+      wx.stopAccelerometer({
+        fail: (err) => {
+          console.error('[Squat] 停止加速度计失败:', err)
+        },
+      })
+    }
+
+    squatSensorStarted = false
+    squatAccelerometerHandler = null
+    resetSquatDetectorState()
   },
 
   closeProfileEditor() {

@@ -275,11 +275,12 @@ Win rate negative state:
 
 ### Structure
 
-Three separate buttons:
+Four separate buttons:
 
 1. 玩家排行
 2. 游戏历史
 3. 记录游戏
+4. 深蹲
 
 ### Style
 
@@ -297,6 +298,8 @@ Three separate buttons:
   - purple family
 - 记录游戏:
   - gold family, stronger emphasis than the other two
+- 深蹲:
+  - standalone functional accent, can use dedicated green gradient when the feature is exercise-related
 
 ### Logic Mapping
 
@@ -306,6 +309,55 @@ Three separate buttons:
   - switch middle card to history content
 - 记录游戏:
   - open recording workflow / drawer
+- 深蹲:
+  - open squat counter popup / exercise workflow
+
+## Overlay And Popup Rules
+
+These rules are required for popup, mask, drawer, and full-screen overlay UI on the Mahjong page.
+
+### Root Mounting Rule
+
+- Full-screen popup containers should be mounted as direct siblings of the main `scroll-view`, not inside the scroll area.
+- Do not place modal mask layers inside scrolling content when the popup is expected to be viewport-centered.
+- On iOS real devices under Skyline, overlays inside `scroll-view` may use the wrong layout reference and appear in the upper-left area even if DevTools looks correct.
+
+### Full-Screen Positioning Rule
+
+- Prefer explicit edge declarations:
+  - `top: 0`
+  - `right: 0`
+  - `bottom: 0`
+  - `left: 0`
+- Also set:
+  - `width: 100%`
+  - `height: 100%`
+- Do not rely on `inset: 0` alone for critical overlay positioning in this project.
+
+### Centering Rule
+
+- Prefer centering through the full-screen container:
+  - `display: flex`
+  - `align-items: center`
+  - `justify-content: center`
+- The popup panel itself should stay in normal flow within the overlay container:
+  - `position: relative`
+  - `width: 100%`
+  - `max-width: 686rpx`
+- Avoid using popup self-centering as the primary strategy when not necessary:
+  - `top: 50%`
+  - `left: 50%`
+  - `transform`
+- In this project, container-level centering is the default choice for overlay components.
+
+### Real Device Verification Rule
+
+- Overlay UI that looks correct in WeChat DevTools must still be verified on iOS real devices.
+- When DevTools is correct but iOS real device is wrong, first inspect:
+  1. whether the overlay is mounted inside `scroll-view`
+  2. whether `inset: 0` is being used
+  3. whether the full-screen container actually has explicit width and height
+- Treat real-device behavior as the source of truth for popup positioning compatibility.
 
 ## Pull-To-Refresh Rules
 
@@ -348,6 +400,7 @@ Before changing related UI, confirm:
 4. Are button states minimal and consistent?
 5. Are highlights limited to the truly important information?
 6. Will this change still look like part of the same page after screenshot comparison?
+7. If this is a popup or mask layer, is it mounted outside `scroll-view` and verified on iOS real device?
 
 ## Source Of Truth
 
@@ -360,4 +413,3 @@ When future updates are made, use these files as implementation references:
 - `miniprogram/pages/majiang/index.wxml`
 - `miniprogram/pages/majiang/index.wxss`
 - `miniprogram/pages/majiang/index.ts`
-

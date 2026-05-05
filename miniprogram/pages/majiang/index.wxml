@@ -95,6 +95,13 @@
       >
         <text class="nav-btn-title">记录游戏</text>
       </view>
+
+      <view
+        class="nav-btn nav-btn-squat {{showSquatPopup ? 'nav-btn-active nav-btn-squat-active' : ''}}"
+        catch:tap="openSquatPopup"
+      >
+        <text class="nav-btn-title">深蹲</text>
+      </view>
     </view>
 
     <view class="game-container">
@@ -143,6 +150,21 @@
         </view>
       </view>
     </view>
+
   </view>
   </scroll-view>
+
+  <view wx:if="{{showSquatPopup}}" class="squat-popup-container">
+    <view class="squat-popup-mask" bindtap="closeSquatPopup"></view>
+    <view class="squat-popup" catch:tap="noop">
+      <view class="squat-popup-handle"></view>
+      <text class="squat-popup-title">当前深蹲次数</text>
+      <text class="squat-popup-count">{{squatCount}}</text>
+      <text class="squat-popup-tip">保持手机竖直握在胸前，完成一次下蹲起立记 1 次</text>
+      <view class="squat-popup-footer">
+        <view class="squat-popup-btn squat-popup-btn-reset" bindtap="resetSquatCount">重置</view>
+        <view class="squat-popup-btn squat-popup-btn-close" bindtap="closeSquatPopup">关闭</view>
+      </view>
+    </view>
+  </view>
 </block>
