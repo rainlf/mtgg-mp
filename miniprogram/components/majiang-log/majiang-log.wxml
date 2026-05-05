@@ -7,9 +7,25 @@
         refresher-triggered="{{isRefreshing}}">
     <view class="list-content">
         <view class="panel-banner panel-banner-history">
-            <text class="panel-banner__title">{{title}}</text>
+            <view wx:if="{{showFitnessTabs}}" class="panel-banner__tabs panel-banner__tabs-fitness">
+                <view
+                    class="panel-banner__tab {{fitnessTab === 'rank' ? 'panel-banner__tab-active' : ''}}"
+                    catch:tap="switchFitnessTab"
+                    data-tab="rank"
+                >
+                    健身榜
+                </view>
+                <view
+                    class="panel-banner__tab {{fitnessTab === 'history' ? 'panel-banner__tab-active' : ''}}"
+                    catch:tap="switchFitnessTab"
+                    data-tab="history"
+                >
+                    健身历史
+                </view>
+            </view>
+            <text wx:else class="panel-banner__title">{{title}}</text>
         </view>
-        <view class="prize-pool-card" wx:if="{{prizePoolLoading || prizePoolInfo}}" bindtap="togglePrizePoolDetail">
+        <view class="prize-pool-card" wx:if="{{!isFitnessHistory && (prizePoolLoading || prizePoolInfo)}}" bindtap="togglePrizePoolDetail">
             <view class="prize-pool-card__header">
                 <text class="prize-pool-card__label">当前奖池</text>
                 <view class="prize-pool-card__header-right">
@@ -26,7 +42,7 @@
                 <text class="prize-pool-card__hint">奖池信息加载中...</text>
             </view>
         </view>
-        <view class="prize-pool-detail" wx:if="{{showPrizePoolDetail}}">
+        <view class="prize-pool-detail" wx:if="{{!isFitnessHistory && showPrizePoolDetail}}">
             <view class="prize-pool-detail__header">
                 <text class="prize-pool-detail__title">奖池明细</text>
                 <text class="prize-pool-detail__subtitle">累计入池与中奖记录</text>
@@ -112,8 +128,8 @@
                     <view class="record-header-right">
                         <view class="record-meta">
                             <text
+                                wx:if="{{!isFitnessHistory}}"
                                 class="recorder-info"
-                                wx:if="{{item.recorder && item.recorder.user && (item.recorder.user.username || item.recorder.user.nickname)}}"
                             >记录人：{{item.recorder.user.username || item.recorder.user.nickname}}<text class="recorder-pool-info" wx:if="{{item.recorder.poolContribution > 0}}"> 奖池 +{{item.recorder.poolContribution}}</text></text>
                             <text class="game-time">{{item.createdTime}}</text>
                         </view>
@@ -128,7 +144,7 @@
                     </view>
                 </view>
 
-                <view class="jackpot-event" wx:if="{{item.jackpotEvent}}">
+                <view class="jackpot-event" wx:if="{{!isFitnessHistory && item.jackpotEvent}}">
                     <view class="jackpot-event__badge">奖池</view>
                     <text class="jackpot-event__text">{{item.jackpotEvent.user.username || item.jackpotEvent.user.nickname}} 中奖了</text>
                     <text class="jackpot-event__points">+{{item.jackpotEvent.points}}</text>
@@ -147,7 +163,7 @@
                                     </block>
                                 </view>
                             </view>
-                            <text class="score-change">+{{item.points}}</text>
+                            <text class="score-change {{isFitnessHistory ? 'score-change-fitness' : ''}}">+{{item.points}}</text>
                         </view>
                     </block>
                 </view>

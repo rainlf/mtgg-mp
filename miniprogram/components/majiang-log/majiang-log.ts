@@ -31,6 +31,18 @@ Component({
       type: Boolean,
       value: false,
     },
+    showFitnessTabs: {
+      type: Boolean,
+      value: false,
+    },
+    fitnessTab: {
+      type: String,
+      value: 'history',
+    },
+    isFitnessHistory: {
+      type: Boolean,
+      value: false,
+    },
   },
   data: {
     isRefreshing: false,
@@ -44,6 +56,20 @@ Component({
   // 记录加载开始的时间戳，用于超时检测
   loadingStartTime: 0,
   methods: {
+    switchFitnessTab(e: any) {
+      const tab = String(e.currentTarget.dataset.tab || '')
+      if (!tab || tab === this.properties.fitnessTab) {
+        return
+      }
+      this.triggerEvent(
+        'switchFitnessTab',
+        { tab },
+        {
+          bubbles: true,
+          composed: true,
+        }
+      )
+    },
     togglePrizePoolDetail() {
       if (this.data.prizePoolLoading || !this.properties.prizePoolInfo) {
         return

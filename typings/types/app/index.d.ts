@@ -9,7 +9,9 @@ interface User {
   nickname: string;
   avatar: string;
   points: number;
+  fitnessPoints?: number;
   totalGames: number;
+  fitnessCount?: number;
   winCount: number;
   winRate: number;
   lastTags: string[];
@@ -108,6 +110,9 @@ interface UserDTO {
   created_at: string;
   updated_at: string;
 }
+
+type RankScene = 'wealth' | 'fitness';
+type HistoryScene = 'game' | 'fitness';
 
 // 番型 DTO
 interface WinTypeDTO {

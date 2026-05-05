@@ -134,6 +134,10 @@
     color: #7c8ea5;
 }
 
+.panel-banner__tabs-fitness {
+    margin-bottom: 0;
+}
+
 .panel-loading {
     display: flex;
     flex-direction: column;
@@ -388,6 +392,11 @@
 .tag-muted {
     background: rgba(125, 142, 165, 0.12);
     color: #7c8ea5;
+}
+
+.tag-fitness-history {
+    background: rgba(255, 183, 77, 0.16);
+    color: #b46b00;
 }
 
 /* 得分样式 */

@@ -86,7 +86,7 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
       user: convertUserDTO(p.user),
       points: p.final_points,
       tags: isSquatRedeem
-        ? [`深蹲 ${p.base_points} 次`]
+        ? []
         : (p.win_types ? p.win_types.map(wt => wt.name) : []),
     }))
 

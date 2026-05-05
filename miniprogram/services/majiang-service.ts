@@ -22,6 +22,24 @@ export const getGameListByUser = (userId: number, limit: number, offset: number)
   })
 }
 
+// 获取全局健身记录
+export const getFitnessList = (limit: number, offset: number): Promise<GameDTO[]> => {
+  return request<GameDTO[]>({
+    url: '/api/game/fitness/recent',
+    method: 'GET',
+    data: { limit, offset },
+  })
+}
+
+// 获取用户个人健身记录
+export const getFitnessListByUser = (userId: number, limit: number, offset: number): Promise<GameDTO[]> => {
+  return request<GameDTO[]>({
+    url: '/api/game/fitness/user/list',
+    method: 'GET',
+    data: { userId, limit, offset },
+  })
+}
+
 // 取消/删除对局记录
 export const cancelGame = (gameId: number): Promise<any> => {
   return request<any>({

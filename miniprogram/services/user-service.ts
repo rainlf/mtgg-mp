@@ -26,6 +26,14 @@ export const getUserRank = (): Promise<UserDTO[]> => {
   })
 }
 
+// 获取健身榜
+export const getFitnessRank = (): Promise<UserDTO[]> => {
+  return request<UserDTO[]>({
+    url: '/api/user/fitness/rank',
+    method: 'GET',
+  })
+}
+
 // 更新用户昵称（不含头像）
 export const updateUsername = (userId: number, nickname: string): Promise<any> => {
   return new Promise((resolve, reject) => {

@@ -1,3 +1,5 @@
+declare const Component: any
+
 Component({
   properties: {
     listData: {
@@ -7,6 +9,14 @@ Component({
     isInitialLoading: {
       type: Boolean,
       value: false,
+    },
+    rankScene: {
+      type: String,
+      value: 'wealth',
+    },
+    fitnessTab: {
+      type: String,
+      value: 'rank',
     },
   },
 
@@ -32,9 +42,39 @@ Component({
 
   methods: {
     updateDisplayList() {
-      const list = Array.isArray((this as any).properties.listData) ? [...((this as any).properties.listData as any[])] : []
-      const rankMode = this.data.rankMode
-      const expandedTagUserIds = Array.isArray(this.data.expandedTagUserIds) ? this.data.expandedTagUserIds : []
+      const self = this as any
+      const list = Array.isArray(self.properties.listData) ? [...(self.properties.listData as any[])] : []
+      const rankScene = String(self.properties.rankScene || 'wealth')
+      if (rankScene === 'fitness') {
+        const sortedList = list.sort((a, b) => {
+          if ((b.fitnessPoints || 0) !== (a.fitnessPoints || 0)) {
+            return (b.fitnessPoints || 0) - (a.fitnessPoints || 0)
+          }
+          if ((b.fitnessCount || 0) !== (a.fitnessCount || 0)) {
+            return (b.fitnessCount || 0) - (a.fitnessCount || 0)
+          }
+          return (a.id || 0) - (b.id || 0)
+        }).map((item) => ({
+          ...item,
+          showNoBattleTag: false,
+          isTagsExpanded: false,
+          canToggleTags: false,
+          displayTags: [],
+          hiddenTagCount: 0,
+          rankMetricText: String(item.fitnessPoints || 0),
+          rankMetricLabel: '次',
+          rankMetricPositive: true,
+          fitnessCountText: String(item.fitnessCount || 0),
+          fitnessTitleText: `深蹲 ${item.fitnessCount || 0} 次`,
+        }))
+        self.setData({
+          displayList: sortedList,
+          worstUser: null,
+        })
+        return
+      }
+      const rankMode = self.data.rankMode
+      const expandedTagUserIds = Array.isArray(self.data.expandedTagUserIds) ? self.data.expandedTagUserIds : []
       const compareParticipation = (a: any, b: any) => {
         const aHasGames = (a.totalGames || 0) > 0
         const bHasGames = (b.totalGames || 0) > 0
@@ -94,59 +134,78 @@ Component({
         rankMetricPositive: rankMode === 'winRate' ? true : (item.points || 0) >= 0,
       }))
 
-      this.setData({
+      self.setData({
         displayList: sortedList,
         worstUser,
       })
     },
     switchRankMode(e: any) {
+      const self = this as any
       const mode = e.currentTarget.dataset.mode
-      if (!mode || mode === this.data.rankMode) {
+      if (!mode || mode === self.data.rankMode) {
         return
       }
-      this.setData({
+      self.setData({
         rankMode: mode,
       }, () => {
-        this.updateDisplayList()
+        self.updateDisplayList()
       })
     },
+    switchFitnessTab(e: any) {
+      const self = this as any
+      const tab = String(e.currentTarget.dataset.tab || '')
+      if (!tab || tab === self.properties.fitnessTab) {
+        return
+      }
+      self.triggerEvent(
+        'switchFitnessTab',
+        { tab },
+        {
+          bubbles: true,
+          composed: true,
+        }
+      )
+    },
     toggleTags(e: any) {
+      const self = this as any
       const userId = Number(e.currentTarget.dataset.id || 0)
       if (!userId) {
         return
       }
-      const expandedTagUserIds = Array.isArray(this.data.expandedTagUserIds) ? [...this.data.expandedTagUserIds] : []
+      const expandedTagUserIds = Array.isArray(self.data.expandedTagUserIds) ? [...self.data.expandedTagUserIds] : []
       const userIndex = expandedTagUserIds.indexOf(userId)
       if (userIndex >= 0) {
         expandedTagUserIds.splice(userIndex, 1)
       } else {
         expandedTagUserIds.push(userId)
       }
-      this.setData({
+      self.setData({
         expandedTagUserIds,
       }, () => {
-        this.updateDisplayList()
+        self.updateDisplayList()
       })
     },
     onRefresh() {
-      if (this.data.isRefreshing) {
+      const self = this as any
+      if (self.data.isRefreshing) {
         return
       }
 
-      this.setData({
+      self.setData({
         isRefreshing: true,
       })
 
-      this.loadData().finally(() => {
-        this.setData({
+      self.loadData().finally(() => {
+        self.setData({
           isRefreshing: false,
         })
       })
     },
     async loadData() {
+      const self = this as any
       try {
         // 触发父页面方法（带参数）
-        this.triggerEvent(
+        self.triggerEvent(
           'load',
           {
             from: 'component',
@@ -161,11 +220,12 @@ Component({
       }
     },
     clickUserAvatar(e: any) {
+      const self = this as any
       const id = e.target.dataset.id
       const username = e.target.dataset.username
       try {
         // 触发父页面方法（带参数）
-        this.triggerEvent(
+        self.triggerEvent(
           'clickUserAvatar',
           {
             from: 'component',

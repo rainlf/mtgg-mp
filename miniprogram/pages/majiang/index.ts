@@ -1,5 +1,5 @@
-import { getUserInfo, getUserRank, updateUsername, uploadUserInfo } from '../../services/user-service'
-import { getGameList, getGameListByUser, cancelGame, getPrizePool, preloadMajiangPlayers, redeemSquat } from '../../services/majiang-service'
+import { getUserInfo, getUserRank, getFitnessRank, updateUsername, uploadUserInfo } from '../../services/user-service'
+import { getGameList, getGameListByUser, getFitnessList, getFitnessListByUser, cancelGame, getPrizePool, preloadMajiangPlayers, redeemSquat } from '../../services/majiang-service'
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
@@ -49,6 +49,18 @@ function getSquatRedeemAmount(count: number) {
   return count
 }
 
+function mapFitnessUser(dto: UserDTO): User {
+  const user = convertUserDTO(dto)
+  user.fitnessPoints = dto.total_points || 0
+  user.fitnessCount = dto.total_games || 0
+  user.points = user.fitnessPoints
+  user.totalGames = user.fitnessCount
+  user.winCount = 0
+  user.winRate = 0
+  user.lastTags = []
+  return user
+}
+
 Page({
   data: {
     user: {} as User,
@@ -60,6 +72,7 @@ Page({
     currentPage: 0,
     pageSize: 10,
     rankList: [] as User[],
+    fitnessRankList: [] as User[],
     gameList: [] as MajiangLog[],
     userGameList: [] as MajiangLog[],
     prizePoolInfo: null as PrizePoolDTO | null,
@@ -68,9 +81,12 @@ Page({
     historyEmptyText: '',
     historyLoading: false,
     showUserRank: true,
+    showFitnessRank: false,
     showGameLog: false,
+    showFitnessLog: false,
     showUserGameLog: false,
-    showUserRankBtn: false,
+    currentRankScene: 'wealth' as RankScene,
+    currentHistoryScene: 'game' as HistoryScene,
     showDrawer: false,
     currentUserId: 0,
     showProfileDrawer: false,
@@ -101,10 +117,10 @@ Page({
       console.error('预加载牌桌玩家失败:', err)
     })
     this.fetchUserInfo()
-    if (this.data.showUserRank) {
+    if (this.data.showUserRank || this.data.showFitnessRank) {
       this.setData({ rankLoading: true })
     }
-    this.fetchUserRank().finally(() => {
+    this.refreshCurrentRankPanel().finally(() => {
       if (this.data.rankLoading) {
         this.setData({ rankLoading: false })
       }
@@ -121,7 +137,7 @@ Page({
 
   onPageRefresh() {
     this.setData({ isPageRefreshing: true })
-    Promise.allSettled([this.fetchUserInfo(), this.fetchUserRank()]).finally(() => {
+    Promise.allSettled([this.fetchUserInfo(), this.refreshCurrentPanelData()]).finally(() => {
       this.setData({ isPageRefreshing: false })
     })
   },
@@ -131,22 +147,38 @@ Page({
   // 子组件下拉刷新触发
   handleRankListLoad() {
     this.fetchUserInfo()
-    this.fetchUserRank()
+    this.refreshCurrentRankPanel()
   },
   handleGameListLoad() {
     this.fetchUserInfo()
+    if (this.data.currentHistoryScene === 'fitness') {
+      this.fetchFitnessList(false)
+      return
+    }
     this.fetchGameList(false)
   },
   handleUserGameListLoad() {
     this.fetchUserInfo()
     if (this.data.currentUserId) {
-      this.fetchUserGameList(this.data.currentUserId, false)
+      if (this.data.currentHistoryScene === 'fitness') {
+        this.fetchUserFitnessList(this.data.currentUserId, false)
+      } else {
+        this.fetchUserGameList(this.data.currentUserId, false)
+      }
     }
   },
   handleCurrentHistoryRefresh() {
     this.fetchUserInfo()
     if (this.data.showUserGameLog && this.data.currentUserId) {
-      this.fetchUserGameList(this.data.currentUserId, false)
+      if (this.data.currentHistoryScene === 'fitness') {
+        this.fetchUserFitnessList(this.data.currentUserId, false)
+      } else {
+        this.fetchUserGameList(this.data.currentUserId, false)
+      }
+      return
+    }
+    if (this.data.currentHistoryScene === 'fitness') {
+      this.fetchFitnessList(false)
       return
     }
     this.fetchGameList(false)
@@ -164,6 +196,20 @@ Page({
       })
       .catch((err) => {
         console.error('获取排行榜失败:', err)
+        throw err
+      })
+  },
+
+  fetchFitnessRank() {
+    return getFitnessRank()
+      .then((dtos) => {
+        const fitnessRankList = dtos.map((dto: UserDTO) => mapFitnessUser(dto))
+        const avatars = fitnessRankList.map((u: User) => ({ id: u.id, avatar: u.avatar }))
+        wx.setStorageSync('avatars', avatars)
+        this.setData({ fitnessRankList })
+      })
+      .catch((err) => {
+        console.error('获取健身榜失败:', err)
         throw err
       })
   },
@@ -216,6 +262,53 @@ Page({
     if (!isLoadMore) {
       this.fetchPrizePoolInfo()
     }
+  },
+
+  fetchFitnessList(isLoadMore: boolean = false) {
+    if (this.data.isLoadingMore) return
+
+    const page = isLoadMore ? this.data.currentPage + 1 : 0
+    const offset = page * this.data.pageSize
+
+    if (isLoadMore) {
+      this.setData({ isLoadingMore: true })
+    } else {
+      this.setData({ historyLoading: true, prizePoolInfo: null, prizePoolLoading: false })
+    }
+
+    const currentUserId = this.data.user ? this.data.user.id : 0
+    getFitnessList(this.data.pageSize, offset)
+      .then((dtos) => {
+        const safeDtos = Array.isArray(dtos) ? dtos : []
+        const avatars = wx.getStorageSync('avatars') || []
+        const validDtos = safeDtos.filter((dto: GameDTO) => Array.isArray(dto.players) && dto.players.length > 0)
+        const formattedList = validDtos.map((dto: GameDTO) => {
+          const log = convertGameDTO(dto, currentUserId)
+          if (avatars.length > 0) this.updateLogAvatars(log, avatars)
+          return log
+        })
+
+        const newGameList = isLoadMore ? [...this.data.gameList, ...formattedList] : formattedList
+        const hasMoreData = formattedList.length > 0 && formattedList.length === this.data.pageSize
+
+        this.setData({
+          gameList: newGameList,
+          currentPage: page,
+          hasMoreData,
+          historyEmptyText: !isLoadMore && newGameList.length === 0 ? '暂无健身记录' : '',
+          historyLoading: false,
+          isLoadingMore: false,
+        })
+        this.notifyComponentLoadMoreComplete()
+      })
+      .catch((err) => {
+        console.error('获取健身记录失败:', err)
+        this.setData({
+          historyLoading: false,
+          isLoadingMore: false,
+        })
+        this.notifyComponentLoadMoreComplete()
+      })
   },
 
   fetchUserInfo() {
@@ -299,6 +392,69 @@ Page({
     }
   },
 
+  fetchUserFitnessList(userId: number, isLoadMore: boolean = false) {
+    if (this.data.isLoadingMore && isLoadMore) return
+    if (!isLoadMore) {
+      this.setData({
+        currentUserId: userId,
+        historyLoading: true,
+        prizePoolInfo: null,
+        prizePoolLoading: false,
+      })
+    }
+
+    const page = isLoadMore ? this.data.currentPage + 1 : 0
+    const offset = page * this.data.pageSize
+
+    if (isLoadMore) {
+      this.setData({ isLoadingMore: true })
+    }
+
+    const currentUserId = this.data.user ? this.data.user.id : 0
+    const targetUserId = isLoadMore ? this.data.currentUserId : userId
+
+    getFitnessListByUser(targetUserId, this.data.pageSize, offset)
+      .then((dtos) => {
+        if (this.data.currentUserId !== targetUserId) {
+          return
+        }
+        const safeDtos = Array.isArray(dtos) ? dtos : []
+        const avatars = wx.getStorageSync('avatars') || []
+        const validDtos = safeDtos.filter((dto: GameDTO) => Array.isArray(dto.players) && dto.players.length > 0)
+        const formattedList = validDtos.map((dto: GameDTO) => {
+          const log = convertGameDTO(dto, currentUserId)
+          log.forOnePlayer = true
+          log.playerWin = true
+          if (avatars.length > 0) this.updateLogAvatars(log, avatars)
+          return log
+        })
+
+        const newUserGameList = isLoadMore ? [...this.data.userGameList, ...formattedList] : formattedList
+        const hasMoreData = formattedList.length > 0 && formattedList.length === this.data.pageSize
+
+        this.setData({
+          userGameList: newUserGameList,
+          currentPage: page,
+          hasMoreData,
+          historyEmptyText: !isLoadMore && newUserGameList.length === 0 ? '暂无健身记录' : '',
+          historyLoading: false,
+          isLoadingMore: false,
+        })
+        this.notifyComponentLoadMoreComplete()
+      })
+      .catch((err) => {
+        if (this.data.currentUserId !== targetUserId) {
+          return
+        }
+        console.error('获取个人健身记录失败:', err)
+        this.setData({
+          historyLoading: false,
+          isLoadingMore: false,
+        })
+        this.notifyComponentLoadMoreComplete()
+      })
+  },
+
   fetchPrizePoolInfo() {
     return getPrizePool()
       .then((prizePoolInfo) => {
@@ -338,7 +494,7 @@ Page({
     this.setData({ isLoadingMore: false })
     try {
       let componentId = ''
-      if (this.data.showGameLog) componentId = '#game-log-component'
+      if (this.data.showGameLog || this.data.showFitnessLog) componentId = '#game-log-component'
       else if (this.data.showUserGameLog) componentId = '#user-game-log-component'
       if (!componentId) return
       const component = this.selectComponent(componentId) as any
@@ -349,10 +505,16 @@ Page({
   },
 
   handleLoadMore() {
-    if (this.data.showGameLog) {
+    if (this.data.showFitnessLog) {
+      this.fetchFitnessList(true)
+    } else if (this.data.showGameLog) {
       this.fetchGameList(true)
     } else if (this.data.showUserGameLog && this.data.currentUserId) {
-      this.fetchUserGameList(this.data.currentUserId, true)
+      if (this.data.currentHistoryScene === 'fitness') {
+        this.fetchUserFitnessList(this.data.currentUserId, true)
+      } else {
+        this.fetchUserGameList(this.data.currentUserId, true)
+      }
     }
   },
 
@@ -363,8 +525,35 @@ Page({
     })
   },
 
+  refreshFitnessRankPanel() {
+    this.setData({ rankLoading: true })
+    return Promise.allSettled([this.fetchUserInfo(), this.fetchFitnessRank()]).finally(() => {
+      this.setData({ rankLoading: false })
+    })
+  },
+
   refreshGameLogPanel() {
     return Promise.allSettled([this.fetchUserInfo(), this.fetchGameList(false)])
+  },
+
+  refreshFitnessLogPanel() {
+    return Promise.allSettled([this.fetchUserInfo(), this.fetchFitnessList(false)])
+  },
+
+  refreshCurrentRankPanel() {
+    return this.data.currentRankScene === 'fitness' ? this.refreshFitnessRankPanel() : this.refreshRankPanel()
+  },
+
+  refreshCurrentPanelData() {
+    if (this.data.showUserRank || this.data.showFitnessRank) {
+      return this.refreshCurrentRankPanel()
+    }
+    if (this.data.showUserGameLog && this.data.currentUserId) {
+      return this.data.currentHistoryScene === 'fitness'
+        ? this.fetchUserFitnessList(this.data.currentUserId, false)
+        : this.fetchUserGameList(this.data.currentUserId, false)
+    }
+    return this.data.currentHistoryScene === 'fitness' ? this.refreshFitnessLogPanel() : this.refreshGameLogPanel()
   },
 
   openProfileEditor() {
@@ -660,15 +849,19 @@ Page({
   openUserRank() {
     this.setData({
       showUserRank: true,
+      showFitnessRank: false,
       showGameLog: false,
+      showFitnessLog: false,
       showUserGameLog: false,
-      showUserRankBtn: false,
+      currentRankScene: 'wealth',
+      currentHistoryScene: 'game',
       showDrawer: false,
       historyTitle: '游戏历史',
       historyEmptyText: '',
       historyLoading: false,
       rankLoading: true,
       rankList: [],
+      fitnessRankList: [],
       currentUserId: 0,
       currentPage: 0,
       hasMoreData: true,
@@ -680,9 +873,11 @@ Page({
   openGameLog() {
     this.setData({
       showUserRank: false,
+      showFitnessRank: false,
       showGameLog: true,
+      showFitnessLog: false,
       showUserGameLog: false,
-      showUserRankBtn: true,
+      currentHistoryScene: 'game',
       showDrawer: false,
       historyTitle: '游戏历史',
       historyEmptyText: '',
@@ -696,6 +891,63 @@ Page({
     })
   },
 
+  openFitnessRank() {
+    this.setData({
+      showUserRank: false,
+      showFitnessRank: true,
+      showGameLog: false,
+      showFitnessLog: false,
+      showUserGameLog: false,
+      currentRankScene: 'fitness',
+      currentHistoryScene: 'fitness',
+      showDrawer: false,
+      historyTitle: '健身历史',
+      historyEmptyText: '',
+      historyLoading: false,
+      rankLoading: true,
+      rankList: [],
+      currentUserId: 0,
+      currentPage: 0,
+      hasMoreData: true,
+    }, () => {
+      this.refreshFitnessRankPanel()
+    })
+  },
+
+  openFitnessLog() {
+    this.setData({
+      showUserRank: false,
+      showFitnessRank: false,
+      showGameLog: false,
+      showFitnessLog: true,
+      showUserGameLog: false,
+      currentHistoryScene: 'fitness',
+      showDrawer: false,
+      historyTitle: '健身历史',
+      historyEmptyText: '',
+      historyLoading: true,
+      currentUserId: 0,
+      gameList: [],
+      currentPage: 0,
+      hasMoreData: true,
+      prizePoolInfo: null,
+      prizePoolLoading: false,
+    }, () => {
+      this.refreshFitnessLogPanel()
+    })
+  },
+
+  handleSwitchFitnessTab(e: any) {
+    const tab = String(e.detail?.tab || '')
+    if (tab === 'history') {
+      this.openFitnessLog()
+      return
+    }
+    if (tab === 'rank') {
+      this.openFitnessRank()
+    }
+  },
+
   openRecordGame() {
     this.setData({
       showDrawer: true,
@@ -707,10 +959,13 @@ Page({
     const username = (e.detail.username || '').trim()
     this.setData({
       showUserRank: false,
+      showFitnessRank: false,
       showGameLog: false,
+      showFitnessLog: false,
       showUserGameLog: true,
-      showUserRankBtn: true,
-      historyTitle: username ? `${username}的游戏历史` : '该玩家的游戏历史',
+      historyTitle: this.data.currentRankScene === 'fitness'
+        ? (username ? `${username}的健身历史` : '该玩家的健身历史')
+        : (username ? `${username}的游戏历史` : '该玩家的游戏历史'),
       historyEmptyText: '',
       historyLoading: true,
       currentUserId: userId,
@@ -719,15 +974,30 @@ Page({
       currentPage: 0,
       hasMoreData: true,
     }, () => {
-      this.fetchUserGameList(userId, false)
+      if (this.data.currentRankScene === 'fitness') {
+        this.setData({ currentHistoryScene: 'fitness' })
+        this.fetchUserFitnessList(userId, false)
+      } else {
+        this.setData({ currentHistoryScene: 'game' })
+        this.fetchUserGameList(userId, false)
+      }
     })
   },
 
   refreshData() {
     this.fetchUserInfo()
     this.fetchUserRank()
+    this.fetchFitnessRank()
     if (this.data.showUserGameLog && this.data.currentUserId) {
-      this.fetchUserGameList(this.data.currentUserId, false)
+      if (this.data.currentHistoryScene === 'fitness') {
+        this.fetchUserFitnessList(this.data.currentUserId, false)
+      } else {
+        this.fetchUserGameList(this.data.currentUserId, false)
+      }
+      return
+    }
+    if (this.data.showFitnessLog) {
+      this.fetchFitnessList(false)
       return
     }
     this.fetchGameList(false)

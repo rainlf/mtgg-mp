@@ -34,12 +34,26 @@
           class="content-panel"
           listData="{{rankList}}"
           isInitialLoading="{{rankLoading}}"
+          rankScene="wealth"
           bind:load="handleRankListLoad"
           bind:clickUserAvatar="handleClickUserAvatar"
         />
       </block>
 
-      <block wx:if="{{showGameLog}}">
+      <block wx:if="{{showFitnessRank}}">
+        <rank
+          class="content-panel"
+          listData="{{fitnessRankList}}"
+          isInitialLoading="{{rankLoading}}"
+          rankScene="fitness"
+          fitnessTab="rank"
+          bind:load="handleRankListLoad"
+          bind:clickUserAvatar="handleClickUserAvatar"
+          bind:switchFitnessTab="handleSwitchFitnessTab"
+        />
+      </block>
+
+      <block wx:if="{{showGameLog || showFitnessLog}}">
         <majiang-log
           class="content-panel"
           id="game-log-component"
@@ -48,11 +62,15 @@
           isInitialLoading="{{historyLoading}}"
           prizePoolInfo="{{prizePoolInfo}}"
           prizePoolLoading="{{prizePoolLoading}}"
+          showFitnessTabs="{{showFitnessLog}}"
+          fitnessTab="history"
+          isFitnessHistory="{{showFitnessLog}}"
           listData="{{gameList}}"
           hasMoreData="{{hasMoreData}}"
           bind:load="handleGameListLoad"
           bind:refreshData="handleCurrentHistoryRefresh"
           bind:loadMore="handleLoadMore"
+          bind:switchFitnessTab="handleSwitchFitnessTab"
         />
       </block>
 
@@ -65,11 +83,15 @@
           isInitialLoading="{{historyLoading}}"
           prizePoolInfo="{{prizePoolInfo}}"
           prizePoolLoading="{{prizePoolLoading}}"
+          showFitnessTabs="{{showUserGameLog && currentHistoryScene === 'fitness'}}"
+          fitnessTab="history"
+          isFitnessHistory="{{showUserGameLog && currentHistoryScene === 'fitness'}}"
           listData="{{userGameList}}"
           hasMoreData="{{hasMoreData}}"
           bind:load="handleUserGameListLoad"
           bind:refreshData="handleCurrentHistoryRefresh"
           bind:loadMore="handleLoadMore"
+          bind:switchFitnessTab="handleSwitchFitnessTab"
         />
       </block>
     </view>
@@ -79,7 +101,7 @@
         class="nav-btn nav-btn-rank {{showUserRank ? 'nav-btn-active nav-btn-rank-active' : ''}}"
         catch:tap="openUserRank"
       >
-        <text class="nav-btn-title">玩家排行</text>
+        <text class="nav-btn-title">富豪榜</text>
       </view>
 
       <view
@@ -101,6 +123,13 @@
         catch:tap="openSquatPopup"
       >
         <text class="nav-btn-title">深蹲</text>
+      </view>
+
+      <view
+        class="nav-btn nav-btn-fitness {{(showFitnessRank || showFitnessLog) ? 'nav-btn-active nav-btn-fitness-active' : ''}}"
+        catch:tap="openFitnessRank"
+      >
+        <text class="nav-btn-title">健身榜</text>
       </view>
     </view>
 

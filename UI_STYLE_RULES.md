@@ -277,7 +277,7 @@ Win rate negative state:
 
 Four separate buttons:
 
-1. 玩家排行
+1. 富豪榜
 2. 游戏历史
 3. 记录游戏
 4. 深蹲
@@ -292,7 +292,7 @@ Four separate buttons:
 
 ### Color Mapping
 
-- 玩家排行:
+- 富豪榜:
   - cyan/blue family
 - 游戏历史:
   - purple family
@@ -303,7 +303,7 @@ Four separate buttons:
 
 ### Logic Mapping
 
-- 玩家排行:
+- 富豪榜:
   - switch middle card to ranking content
 - 游戏历史:
   - switch middle card to history content

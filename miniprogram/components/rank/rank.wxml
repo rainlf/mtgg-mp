@@ -7,7 +7,7 @@
 >
     <view class="list-content">
         <view class="panel-banner">
-            <view class="panel-banner__tabs">
+            <view wx:if="{{rankScene !== 'fitness'}}" class="panel-banner__tabs">
                 <view
                     class="panel-banner__tab {{rankMode === 'points' ? 'panel-banner__tab-active' : ''}}"
                     catch:tap="switchRankMode"
@@ -23,7 +23,7 @@
                     胜率榜
                 </view>
             </view>
-            <view class="panel-banner__worst">
+            <view wx:if="{{rankScene !== 'fitness'}}" class="panel-banner__worst">
                 <text class="panel-banner__worst-title">全场最菜🥬 居然是👉</text>
                 <block wx:if="{{worstUser}}">
                     <view class="panel-banner__worst-user">
@@ -42,6 +42,22 @@
                     </view>
                 </block>
                 <text wx:else class="panel-banner__worst-empty">暂无玩家</text>
+            </view>
+            <view wx:else class="panel-banner__tabs panel-banner__tabs-fitness">
+                <view
+                    class="panel-banner__tab {{fitnessTab === 'rank' ? 'panel-banner__tab-active' : ''}}"
+                    catch:tap="switchFitnessTab"
+                    data-tab="rank"
+                >
+                    健身榜
+                </view>
+                <view
+                    class="panel-banner__tab {{fitnessTab === 'history' ? 'panel-banner__tab-active' : ''}}"
+                    catch:tap="switchFitnessTab"
+                    data-tab="history"
+                >
+                    健身历史
+                </view>
             </view>
         </view>
 
@@ -83,13 +99,18 @@
                         <text class="nickname">{{item.username}}</text>
                     </view>
                     <view class="tags-box">
-                        <text wx:if="{{item.showNoBattleTag}}" class="tag tag-muted">未参战</text>
-                        <block wx:for="{{item.displayTags}}" wx:key="index">
-                            <text wx:if="{{item === '一炮双响' || item === '一炮三响'}}" class="tag2-red">{{item}}</text>
-                            <text wx:elif="{{item === '相公'}}" class="tag2">{{item}}</text>
-                            <text wx:else class="tag">{{item}}</text>
+                        <block wx:if="{{rankScene === 'fitness'}}">
+                            <text class="tag tag-fitness-history">{{item.fitnessTitleText}}</text>
                         </block>
-                        <text wx:if="{{item.canToggleTags}}" class="tag tag-more" catch:tap="toggleTags" data-id="{{item.id}}">{{item.isTagsExpanded ? '收起' : '+' + item.hiddenTagCount}}</text>
+                        <block wx:else>
+                            <text wx:if="{{item.showNoBattleTag}}" class="tag tag-muted">未参战</text>
+                            <block wx:for="{{item.displayTags}}" wx:key="index">
+                                <text wx:if="{{item === '一炮双响' || item === '一炮三响'}}" class="tag2-red">{{item}}</text>
+                                <text wx:elif="{{item === '相公'}}" class="tag2">{{item}}</text>
+                                <text wx:else class="tag">{{item}}</text>
+                            </block>
+                            <text wx:if="{{item.canToggleTags}}" class="tag tag-more" catch:tap="toggleTags" data-id="{{item.id}}">{{item.isTagsExpanded ? '收起' : '+' + item.hiddenTagCount}}</text>
+                        </block>
                     </view>
                 </view>
 
