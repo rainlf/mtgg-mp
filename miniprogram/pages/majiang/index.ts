@@ -3,20 +3,28 @@ import { getGameList, getGameListByUser, getFitnessList, getFitnessListByUser, c
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
-const SQUAT_DOWN_THRESHOLD = -0.14
-const SQUAT_UP_THRESHOLD = 0.14
+const SQUAT_DOWN_THRESHOLD = -0.12
+const SQUAT_UP_THRESHOLD = 0.12
+const SQUAT_RETURN_THRESHOLD = -0.04
+const SQUAT_RECOVERY_THRESHOLD = 0.16
+const SQUAT_RESET_THRESHOLD = 0.08
+const SQUAT_BASE_ADJUST_WEIGHT = 0.04
+const SQUAT_BASE_ADJUST_DELTA_LIMIT = 0.08
 const SQUAT_MIN_ACTION_GAP = 900
 const SQUAT_MAX_COUNT = 100
 const SQUAT_LOCK_COUNT = 101
-const SQUAT_INITIAL_COUNT = 93
+const SQUAT_INITIAL_COUNT = 0
 const SENSOR_UNSUPPORTED_ERROR = 'startAccelerometer:fail system permission denied'
+const SQUAT_DEBUG_SERVER_URL = 'http://127.0.0.1:7777/event'
+const SQUAT_DEBUG_SESSION_ID = 'squat-double-count'
 
-type SquatMotionState = 'idle' | 'down'
+type SquatMotionState = 'idle' | 'down' | 'cooldown'
 
 let squatMotionState: SquatMotionState = 'idle'
 let squatLastCountTime = 0
 let squatBaseY: number | null = null
 let squatSmoothY: number | null = null
+let squatDownMinDelta = 0
 let squatSensorStarted = false
 let squatAccelerometerHandler: WechatMiniprogram.OnAccelerometerChangeCallback | null = null
 
@@ -25,6 +33,32 @@ function resetSquatDetectorState() {
   squatLastCountTime = 0
   squatBaseY = null
   squatSmoothY = null
+  squatDownMinDelta = 0
+}
+
+function reportSquatDebug(
+  hypothesisId: 'A' | 'B' | 'C' | 'D' | 'E',
+  location: string,
+  msg: string,
+  data: Record<string, unknown>,
+) {
+  try {
+    wx.request({
+      url: SQUAT_DEBUG_SERVER_URL,
+      method: 'POST',
+      timeout: 1200,
+      data: {
+        sessionId: SQUAT_DEBUG_SESSION_ID,
+        runId: 'pre-fix',
+        hypothesisId,
+        location,
+        msg: `[DEBUG] ${msg}`,
+        data,
+        ts: Date.now(),
+      },
+      fail: () => {},
+    })
+  } catch (_) {}
 }
 
 function getSquatStep(count: number) {
@@ -89,7 +123,7 @@ Page({
     userGameList: [] as MajiangLog[],
     prizePoolInfo: null as PrizePoolDTO | null,
     prizePoolLoading: false,
-    historyTitle: '游戏历史',
+    historyTitle: '奖池&账本',
     historyEmptyText: '',
     historyLoading: false,
     showUserRank: true,
@@ -716,6 +750,13 @@ Page({
     }
 
     resetSquatDetectorState()
+    // #region debug-point E:start-detect
+    reportSquatDebug('E', 'majiang/index.ts:startSquatDetect', 'start squat detect', {
+      squatCount: this.data.squatCount,
+      sensorStarted: squatSensorStarted,
+      showSquatPopup: this.data.showSquatPopup,
+    })
+    // #endregion
     squatAccelerometerHandler = (res) => {
       if (!this.data.showSquatPopup) {
         return
@@ -724,6 +765,11 @@ Page({
       if (squatBaseY === null || squatSmoothY === null) {
         squatBaseY = res.y
         squatSmoothY = res.y
+        // #region debug-point C:init-base
+        reportSquatDebug('C', 'majiang/index.ts:init-base', 'init squat base', {
+          y: res.y,
+        })
+        // #endregion
         return
       }
 
@@ -731,28 +777,98 @@ Page({
       const deltaY = squatSmoothY - squatBaseY
       const now = Date.now()
 
-      if (squatMotionState === 'idle' && deltaY <= SQUAT_DOWN_THRESHOLD) {
-        squatMotionState = 'down'
+      if (squatMotionState === 'cooldown') {
+        if (Math.abs(deltaY) <= SQUAT_RESET_THRESHOLD) {
+          // #region debug-point A:cooldown-reset
+          reportSquatDebug('A', 'majiang/index.ts:cooldown-reset', 'cooldown reset to idle', {
+            deltaY,
+            resetThreshold: SQUAT_RESET_THRESHOLD,
+            now,
+            sinceLastCount: now - squatLastCountTime,
+          })
+          // #endregion
+          squatMotionState = 'idle'
+        }
         return
       }
 
-      if (squatMotionState === 'down' && deltaY >= SQUAT_UP_THRESHOLD) {
-        if (now - squatLastCountTime >= SQUAT_MIN_ACTION_GAP) {
-          squatLastCountTime = now
-          const currentCount = this.data.squatCount
-          const step = getSquatStep(currentCount)
-          const nextCount = Math.min(SQUAT_LOCK_COUNT, currentCount + step)
-          this.setData({
-            squatCount: nextCount,
-            squatDisplayCount: getSquatDisplayCount(nextCount),
-            squatStep: getSquatStep(nextCount),
-            squatTheme: getSquatTheme(nextCount),
-          })
-          if (nextCount >= SQUAT_LOCK_COUNT) {
-            this.stopSquatDetect()
-          }
+      if (squatMotionState === 'idle' && Math.abs(deltaY) <= SQUAT_BASE_ADJUST_DELTA_LIMIT) {
+        // #region debug-point C:base-adjust
+        reportSquatDebug('C', 'majiang/index.ts:base-adjust', 'adjust squat base', {
+          deltaY,
+          baseY: squatBaseY,
+          smoothY: squatSmoothY,
+        })
+        // #endregion
+        squatBaseY = squatBaseY * (1 - SQUAT_BASE_ADJUST_WEIGHT) + squatSmoothY * SQUAT_BASE_ADJUST_WEIGHT
+      }
+
+      if (squatMotionState === 'idle' && deltaY <= SQUAT_DOWN_THRESHOLD) {
+        // #region debug-point A:enter-down
+        reportSquatDebug('A', 'majiang/index.ts:enter-down', 'enter down state', {
+          deltaY,
+          downThreshold: SQUAT_DOWN_THRESHOLD,
+          baseY: squatBaseY,
+          smoothY: squatSmoothY,
+          now,
+          sinceLastCount: now - squatLastCountTime,
+        })
+        // #endregion
+        squatMotionState = 'down'
+        squatDownMinDelta = deltaY
+        return
+      }
+
+      if (squatMotionState === 'down') {
+        squatDownMinDelta = Math.min(squatDownMinDelta, deltaY)
+        const recoveredDelta = deltaY - squatDownMinDelta
+        const isSlowReturn = deltaY >= SQUAT_RETURN_THRESHOLD && recoveredDelta >= SQUAT_RECOVERY_THRESHOLD
+
+        if (deltaY < SQUAT_DOWN_THRESHOLD * 0.5) {
+          return
         }
-        squatMotionState = 'idle'
+
+        if (deltaY >= SQUAT_UP_THRESHOLD || isSlowReturn) {
+          // #region debug-point B:count-branch
+          reportSquatDebug('B', 'majiang/index.ts:count-branch', 'hit count branch', {
+            deltaY,
+            upThreshold: SQUAT_UP_THRESHOLD,
+            returnThreshold: SQUAT_RETURN_THRESHOLD,
+            recoveredDelta,
+            recoveryThreshold: SQUAT_RECOVERY_THRESHOLD,
+            isSlowReturn,
+            downMinDelta: squatDownMinDelta,
+            now,
+            sinceLastCount: now - squatLastCountTime,
+            currentState: squatMotionState,
+          })
+          // #endregion
+          if (now - squatLastCountTime >= SQUAT_MIN_ACTION_GAP) {
+            squatLastCountTime = now
+            const currentCount = this.data.squatCount
+            const step = getSquatStep(currentCount)
+            const nextCount = Math.min(SQUAT_LOCK_COUNT, currentCount + step)
+            this.setData({
+              squatCount: nextCount,
+              squatDisplayCount: getSquatDisplayCount(nextCount),
+              squatStep: getSquatStep(nextCount),
+              squatTheme: getSquatTheme(nextCount),
+            })
+            if (nextCount >= SQUAT_LOCK_COUNT) {
+              this.stopSquatDetect()
+            }
+          }
+          // #region debug-point A:enter-cooldown
+          reportSquatDebug('A', 'majiang/index.ts:enter-cooldown', 'enter cooldown after count', {
+            deltaY,
+            now,
+            lastCountTime: squatLastCountTime,
+            nextState: 'cooldown',
+          })
+          // #endregion
+          squatMotionState = 'cooldown'
+          squatDownMinDelta = 0
+        }
       }
     }
 
@@ -760,6 +876,11 @@ Page({
       interval: 'game',
       success: () => {
         squatSensorStarted = true
+        // #region debug-point E:start-accelerometer-success
+        reportSquatDebug('E', 'majiang/index.ts:start-accelerometer-success', 'accelerometer started', {
+          sensorStarted: squatSensorStarted,
+        })
+        // #endregion
         if (squatAccelerometerHandler) {
           wx.onAccelerometerChange(squatAccelerometerHandler)
         }
@@ -781,6 +902,13 @@ Page({
   },
 
   stopSquatDetect() {
+    // #region debug-point E:stop-detect
+    reportSquatDebug('E', 'majiang/index.ts:stopSquatDetect', 'stop squat detect', {
+      sensorStarted: squatSensorStarted,
+      hasHandler: Boolean(squatAccelerometerHandler),
+      squatCount: this.data.squatCount,
+    })
+    // #endregion
     if (squatAccelerometerHandler) {
       wx.offAccelerometerChange(squatAccelerometerHandler)
     }
@@ -878,7 +1006,7 @@ Page({
       currentRankScene: 'wealth',
       currentHistoryScene: 'game',
       showDrawer: false,
-      historyTitle: '游戏历史',
+      historyTitle: '奖池&账本',
       historyEmptyText: '',
       historyLoading: false,
       rankLoading: true,
@@ -901,7 +1029,7 @@ Page({
       showUserGameLog: false,
       currentHistoryScene: 'game',
       showDrawer: false,
-      historyTitle: '游戏历史',
+      historyTitle: '奖池&账本',
       historyEmptyText: '',
       historyLoading: true,
       currentUserId: 0,
