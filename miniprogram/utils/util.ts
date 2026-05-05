@@ -103,8 +103,10 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
   // 兼容两种来源：
   // 1) 后端新增独立 RoleRecorder(3) 行承载“记录者奖励分”
   // 2) 旧逻辑仅能通过 created_by + 玩家列表里同 user_id 的行推断
-  const recorderPlayer = dtoPlayers.find(p => p.role_code === 3) ||
-    dtoPlayers.find(p => p.user && dto.created_by && p.user.id === dto.created_by.id)
+  const recorderPlayer = !isSquatRedeem
+    ? (dtoPlayers.find(p => p.role_code === 3) ||
+      dtoPlayers.find(p => p.user && dto.created_by && p.user.id === dto.created_by.id))
+    : undefined
   const recorderUser = dto.created_by
     ? convertUserDTO(dto.created_by)
     : (recorderPlayer && recorderPlayer.user ? convertUserDTO(recorderPlayer.user) : emptyUser)
@@ -116,7 +118,7 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
     tags: [],
   }
 
-  const jackpotEvent: MajiangJackpotEvent | null = recorderPlayer && recorderPlayer.final_points > 0
+  const jackpotEvent: MajiangJackpotEvent | null = !isSquatRedeem && recorderPlayer && recorderPlayer.final_points > 0
     ? {
       user: recorderUser,
       points: recorderPlayer.final_points,

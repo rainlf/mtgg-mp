@@ -7,7 +7,8 @@ const SQUAT_DOWN_THRESHOLD = -0.14
 const SQUAT_UP_THRESHOLD = 0.14
 const SQUAT_MIN_ACTION_GAP = 900
 const SQUAT_MAX_COUNT = 100
-const SQUAT_INITIAL_COUNT = 0
+const SQUAT_LOCK_COUNT = 101
+const SQUAT_INITIAL_COUNT = 93
 const SENSOR_UNSUPPORTED_ERROR = 'startAccelerometer:fail system permission denied'
 
 type SquatMotionState = 'idle' | 'down'
@@ -42,9 +43,20 @@ function getSquatTheme(count: number) {
   return 'theme-1'
 }
 
+function getSquatDisplayCount(count: number) {
+  return Math.min(count, SQUAT_MAX_COUNT)
+}
+
 function getSquatRedeemAmount(count: number) {
   if (count >= SQUAT_MAX_COUNT) {
-    return count + 100
+    return getSquatDisplayCount(count) + 100
+  }
+  return count
+}
+
+function getSquatSubmitCount(count: number) {
+  if (count >= SQUAT_MAX_COUNT) {
+    return getSquatDisplayCount(count) + 100
   }
   return count
 }
@@ -96,12 +108,14 @@ Page({
     isProfileSaving: false,
     showSquatPopup: false,
     squatCount: SQUAT_INITIAL_COUNT,
+    squatDisplayCount: getSquatDisplayCount(SQUAT_INITIAL_COUNT),
     squatStep: getSquatStep(SQUAT_INITIAL_COUNT),
     squatTheme: getSquatTheme(SQUAT_INITIAL_COUNT),
     isSquatRedeeming: false,
     showSquatConfirm: false,
     squatConfirmCount: SQUAT_INITIAL_COUNT,
     squatConfirmTheme: getSquatTheme(SQUAT_INITIAL_COUNT),
+    squatConfirmReachedMax: false,
   },
 
   onLoad() {
@@ -575,6 +589,7 @@ Page({
     this.setData({
       showSquatPopup: true,
       squatCount: SQUAT_INITIAL_COUNT,
+      squatDisplayCount: getSquatDisplayCount(SQUAT_INITIAL_COUNT),
       squatStep: getSquatStep(SQUAT_INITIAL_COUNT),
       squatTheme: getSquatTheme(SQUAT_INITIAL_COUNT),
       showDrawer: false,
@@ -601,6 +616,7 @@ Page({
     resetSquatDetectorState()
     this.setData({
       squatCount: SQUAT_INITIAL_COUNT,
+      squatDisplayCount: getSquatDisplayCount(SQUAT_INITIAL_COUNT),
       squatStep: getSquatStep(SQUAT_INITIAL_COUNT),
       squatTheme: getSquatTheme(SQUAT_INITIAL_COUNT),
     })
@@ -626,6 +642,7 @@ Page({
       showSquatConfirm: true,
       squatConfirmCount: redeemAmount,
       squatConfirmTheme: getSquatTheme(currentCount),
+      squatConfirmReachedMax: currentCount >= SQUAT_MAX_COUNT,
     })
   },
 
@@ -635,6 +652,7 @@ Page({
     }
     this.setData({
       showSquatConfirm: false,
+      squatConfirmReachedMax: false,
     })
     if (this.data.showSquatPopup) {
       this.startSquatDetect()
@@ -645,6 +663,7 @@ Page({
     if (this.data.isSquatRedeeming) {
       return
     }
+    const submitCount = getSquatSubmitCount(this.data.squatCount)
     const redeemAmount = this.data.squatConfirmCount
     this.setData({
       isSquatRedeeming: true,
@@ -652,7 +671,7 @@ Page({
 
     redeemSquat({
       user_id: this.data.user.id,
-      squat_count: redeemAmount,
+      squat_count: submitCount,
     })
       .then(() => {
         this.setData({
@@ -661,7 +680,9 @@ Page({
           showSquatPopup: false,
           squatConfirmCount: SQUAT_INITIAL_COUNT,
           squatConfirmTheme: getSquatTheme(SQUAT_INITIAL_COUNT),
+          squatConfirmReachedMax: false,
           squatCount: SQUAT_INITIAL_COUNT,
+          squatDisplayCount: getSquatDisplayCount(SQUAT_INITIAL_COUNT),
           squatStep: getSquatStep(SQUAT_INITIAL_COUNT),
           squatTheme: getSquatTheme(SQUAT_INITIAL_COUNT),
         })
@@ -690,7 +711,7 @@ Page({
     if (squatSensorStarted) {
       return
     }
-    if (this.data.squatCount >= SQUAT_MAX_COUNT) {
+    if (this.data.squatCount >= SQUAT_LOCK_COUNT) {
       return
     }
 
@@ -720,13 +741,14 @@ Page({
           squatLastCountTime = now
           const currentCount = this.data.squatCount
           const step = getSquatStep(currentCount)
-          const nextCount = Math.min(SQUAT_MAX_COUNT, currentCount + step)
+          const nextCount = Math.min(SQUAT_LOCK_COUNT, currentCount + step)
           this.setData({
             squatCount: nextCount,
+            squatDisplayCount: getSquatDisplayCount(nextCount),
             squatStep: getSquatStep(nextCount),
             squatTheme: getSquatTheme(nextCount),
           })
-          if (nextCount >= SQUAT_MAX_COUNT) {
+          if (nextCount >= SQUAT_LOCK_COUNT) {
             this.stopSquatDetect()
           }
         }

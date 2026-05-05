@@ -189,7 +189,7 @@
       <view class="squat-popup-handle"></view>
       <text class="squat-popup-title">当前深蹲次数</text>
       <view class="squat-popup-count-row">
-        <text class="squat-popup-count">{{squatCount}}</text>
+        <text class="squat-popup-count">{{squatDisplayCount}}</text>
         <text wx:if="{{squatCount >= 100}}" class="squat-popup-count-bonus">+100!</text>
       </view>
       <view class="squat-popup-tip">
@@ -218,11 +218,16 @@
     <view class="squat-confirm {{squatConfirmTheme}}" catch:tap="noop">
       <view class="squat-confirm-icon">金</view>
       <view class="squat-confirm-title">
-        <text>是否要兑换 </text>
-        <text class="squat-confirm-amount">+{{squatConfirmCount}}</text>
-        <text class="squat-confirm-amount"> 金币</text>
+        <block wx:if="{{squatConfirmReachedMax}}">
+          <text>恭喜，太牛了！这是你应得的奖励</text>
+        </block>
+        <block wx:else>
+          <text>是否要兑换 </text>
+          <text class="squat-confirm-amount">+{{squatConfirmCount}}</text>
+          <text class="squat-confirm-amount"> 金币</text>
+        </block>
       </view>
-      <text class="squat-confirm-tip">继续下去也许会有惊喜哦</text>
+      <text class="squat-confirm-tip">{{squatConfirmReachedMax ? '100 个深蹲达成，快把这份奖励收下吧' : '继续下去也许会有惊喜哦'}}</text>
       <view class="squat-confirm-footer">
         <view class="squat-confirm-btn squat-confirm-btn-cancel" bindtap="cancelSquatRedeem">再想想</view>
         <view class="squat-confirm-btn squat-confirm-btn-confirm" bindtap="confirmSquatRedeem">
