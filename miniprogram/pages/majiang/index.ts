@@ -54,10 +54,10 @@ Page({
     profileAvatarChanged: false,
     isProfileSaving: false,
     showSquatPopup: false,
-    squatCount: 1,
+    squatCount: 11,
     isSquatRedeeming: false,
     showSquatConfirm: false,
-    squatConfirmCount: 1,
+    squatConfirmCount: 11,
   },
 
   onLoad() {
@@ -357,7 +357,7 @@ Page({
 
     this.setData({
       showSquatPopup: true,
-      squatCount: 1,
+      squatCount: 11,
       showDrawer: false,
       showProfileDrawer: false,
     }, () => {
@@ -378,7 +378,7 @@ Page({
   resetSquatCount() {
     resetSquatDetectorState()
     this.setData({
-      squatCount: 1,
+      squatCount: 11,
     })
   },
 
@@ -433,8 +433,8 @@ Page({
           isSquatRedeeming: false,
           showSquatConfirm: false,
           showSquatPopup: false,
-          squatConfirmCount: 1,
-          squatCount: 1,
+          squatConfirmCount: 11,
+          squatCount: 11,
         })
         wx.showToast({
           title: `已兑换 ${currentCount} 金币`,
@@ -487,7 +487,7 @@ Page({
         if (now - squatLastCountTime >= SQUAT_MIN_ACTION_GAP) {
           squatLastCountTime = now
           this.setData({
-            squatCount: this.data.squatCount + 1,
+            squatCount: this.data.squatCount + 2,
           })
         }
         squatMotionState = 'idle'

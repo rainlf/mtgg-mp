@@ -473,6 +473,10 @@ page {
   color: #16a76c;
 }
 
+.squat-popup-count-hit {
+  color: #ff9f1a;
+}
+
 .squat-popup-tip {
   margin-top: 24rpx;
   font-size: 24rpx;
@@ -484,6 +488,10 @@ page {
 .squat-popup-tip-highlight {
   color: #16a76c;
   font-weight: 700;
+}
+
+.squat-popup-tip-highlight-hit {
+  color: #ff9f1a;
 }
 
 .squat-popup-footer {
@@ -584,12 +592,21 @@ page {
   color: #16a76c;
 }
 
+.squat-confirm-amount-hit {
+  color: #ff9f1a;
+}
+
 .squat-confirm-tip {
   margin-top: 20rpx;
   font-size: 26rpx;
   line-height: 1.6;
   color: #c88712;
   text-align: center;
+}
+
+.squat-confirm-tip-hit {
+  color: #ff9f1a;
+  font-weight: 700;
 }
 
 .squat-confirm-footer {

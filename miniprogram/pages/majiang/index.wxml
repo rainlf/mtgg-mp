@@ -159,10 +159,10 @@
     <view class="squat-popup" catch:tap="noop">
       <view class="squat-popup-handle"></view>
       <text class="squat-popup-title">当前深蹲次数</text>
-      <text class="squat-popup-count">{{squatCount}}</text>
+      <text class="squat-popup-count {{squatCount >= 10 ? 'squat-popup-count-hit' : ''}}">{{squatCount}}</text>
       <view class="squat-popup-tip">
         <text>保持手机竖直握在胸前，完成一次下蹲起立记 </text>
-        <text class="squat-popup-tip-highlight">+{{squatCount}}</text>
+        <text class="squat-popup-tip-highlight {{squatCount >= 10 ? 'squat-popup-tip-highlight-hit' : ''}}">+{{squatCount}}</text>
         <text> 次</text>
       </view>
       <view class="squat-popup-footer">
@@ -179,10 +179,10 @@
       <view class="squat-confirm-icon">金</view>
       <view class="squat-confirm-title">
         <text>是否要兑换 </text>
-        <text class="squat-confirm-amount">+{{squatConfirmCount}}</text>
-        <text class="squat-confirm-amount"> 金币</text>
+        <text class="squat-confirm-amount {{squatConfirmCount >= 10 ? 'squat-confirm-amount-hit' : ''}}">+{{squatConfirmCount}}</text>
+        <text class="squat-confirm-amount {{squatConfirmCount >= 10 ? 'squat-confirm-amount-hit' : ''}}"> 金币</text>
       </view>
-      <text class="squat-confirm-tip">继续下去也许会有惊喜哦</text>
+      <text class="squat-confirm-tip {{squatConfirmCount >= 10 ? 'squat-confirm-tip-hit' : ''}}">继续下去也许会有惊喜哦</text>
       <view class="squat-confirm-footer">
         <view class="squat-confirm-btn squat-confirm-btn-cancel" bindtap="cancelSquatRedeem">再想想</view>
         <view class="squat-confirm-btn squat-confirm-btn-confirm" bindtap="confirmSquatRedeem">
