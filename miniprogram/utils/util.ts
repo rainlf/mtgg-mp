@@ -61,6 +61,7 @@ export const convertUserDTO = (dto: UserDTO): User => {
 // 将后端 GameDTO 转为前端 MajiangLog 结构
 export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog => {
   const dtoPlayers = Array.isArray(dto.players) ? dto.players : []
+  const isSquatRedeem = dto.type_code === 6
   
   // 如果数据异常少于4人，用空用户补齐，避免前端渲染出错
   const emptyUser: User = {
@@ -70,7 +71,7 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
     gameInfo: { basePoints: 0, winTypes: [], multi: 1 },
   }
 
-  const allParticipants = dtoPlayers.filter(p => p.role_code === 1 || p.role_code === 2 || p.role_code === 3 || p.role_code === 4)
+  const allParticipants = dtoPlayers.filter(p => p.role_code === 1 || p.role_code === 2 || p.role_code === 3 || p.role_code === 4 || p.role_code === 5)
   const playerList = allParticipants.sort((a, b) => a.seat - b.seat)
 
   const player1 = playerList[0] ? convertUserDTO(playerList[0].user) : emptyUser
@@ -80,11 +81,13 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
 
   // 构建赢家列表
   const winners: MajiangLogItem[] = dtoPlayers
-    .filter(p => p.role_code === 1)
+    .filter(p => isSquatRedeem ? p.role_code === 5 : p.role_code === 1)
     .map(p => ({
       user: convertUserDTO(p.user),
       points: p.final_points,
-      tags: p.win_types ? p.win_types.map(wt => wt.name) : [],
+      tags: isSquatRedeem
+        ? [`深蹲 ${p.base_points} 次`]
+        : (p.win_types ? p.win_types.map(wt => wt.name) : []),
     }))
 
   // 构建输家列表
@@ -124,8 +127,8 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
   const deleteIcon = (recorderUser.id === currentUserId) ? '/images/delete.png' : '/images/delete2.png'
 
   // 是否为当前用户的个人视图下的对局
-  const currentPlayerInGame = dtoPlayers.find(p => p.user.id === currentUserId)
-  const playerWin = currentPlayerInGame ? currentPlayerInGame.role_code === 1 : false
+  const currentPlayerInGame = dtoPlayers.find(p => p.user && p.user.id === currentUserId)
+  const playerWin = currentPlayerInGame ? currentPlayerInGame.role_code === 1 || currentPlayerInGame.role_code === 5 : false
 
   return {
     id: dto.id,

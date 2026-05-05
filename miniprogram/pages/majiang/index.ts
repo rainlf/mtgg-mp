@@ -1,5 +1,5 @@
 import { getUserInfo, getUserRank, updateUsername, uploadUserInfo } from '../../services/user-service'
-import { getGameList, getGameListByUser, cancelGame, getPrizePool, preloadMajiangPlayers } from '../../services/majiang-service'
+import { getGameList, getGameListByUser, cancelGame, getPrizePool, preloadMajiangPlayers, redeemSquat } from '../../services/majiang-service'
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
@@ -54,7 +54,8 @@ Page({
     profileAvatarChanged: false,
     isProfileSaving: false,
     showSquatPopup: false,
-    squatCount: 0,
+    squatCount: 1,
+    isSquatRedeeming: false,
   },
 
   onLoad() {
@@ -354,7 +355,7 @@ Page({
 
     this.setData({
       showSquatPopup: true,
-      squatCount: 0,
+      squatCount: 1,
       showDrawer: false,
       showProfileDrawer: false,
     }, () => {
@@ -363,6 +364,9 @@ Page({
   },
 
   closeSquatPopup() {
+    if (this.data.isSquatRedeeming) {
+      return
+    }
     this.setData({
       showSquatPopup: false,
     })
@@ -372,8 +376,58 @@ Page({
   resetSquatCount() {
     resetSquatDetectorState()
     this.setData({
-      squatCount: 0,
+      squatCount: 1,
     })
+  },
+
+  redeemSquatPoints() {
+    if (this.data.isSquatRedeeming) {
+      return
+    }
+    if (!this.data.user || !this.data.user.id) {
+      wx.showToast({ title: '用户信息异常', icon: 'none' })
+      return
+    }
+    if (this.data.squatCount <= 0) {
+      wx.showToast({ title: '请先完成一次深蹲', icon: 'none' })
+      return
+    }
+
+    const currentCount = this.data.squatCount
+    this.stopSquatDetect()
+    this.setData({
+      isSquatRedeeming: true,
+    })
+
+    redeemSquat({
+      user_id: this.data.user.id,
+      squat_count: currentCount,
+    })
+      .then(() => {
+        this.setData({
+          isSquatRedeeming: false,
+          showSquatPopup: false,
+          squatCount: 1,
+        })
+        wx.showToast({
+          title: `已兑换 ${currentCount} 金币`,
+          icon: 'success',
+        })
+        this.refreshData()
+      })
+      .catch((err) => {
+        console.error('[Squat] 兑换失败:', err)
+        this.setData({
+          isSquatRedeeming: false,
+        })
+        wx.showToast({
+          title: String(err || '兑换失败'),
+          icon: 'none',
+        })
+        if (this.data.showSquatPopup) {
+          this.startSquatDetect()
+        }
+      })
   },
 
   startSquatDetect() {

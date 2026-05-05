@@ -120,6 +120,15 @@ export const saveMaJiangGame = (data: RecordMaJiangGameRequest): Promise<any> =>
   return recordMaJiangGame(data)
 }
 
+export const redeemSquat = (data: RedeemSquatRequest): Promise<any> => {
+  return request<any>({
+    url: '/api/game/squat/redeem',
+    method: 'POST',
+    data,
+    header: { 'content-type': 'application/json' },
+  })
+}
+
 export const deleteMajiangLog = (gameId: number, _userId: number): Promise<any> => {
   return cancelGame(gameId)
 }

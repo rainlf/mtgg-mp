@@ -155,15 +155,16 @@
   </scroll-view>
 
   <view wx:if="{{showSquatPopup}}" class="squat-popup-container">
-    <view class="squat-popup-mask" bindtap="closeSquatPopup"></view>
+    <view class="squat-popup-mask" catch:tap="noop"></view>
     <view class="squat-popup" catch:tap="noop">
       <view class="squat-popup-handle"></view>
       <text class="squat-popup-title">当前深蹲次数</text>
       <text class="squat-popup-count">{{squatCount}}</text>
       <text class="squat-popup-tip">保持手机竖直握在胸前，完成一次下蹲起立记 1 次</text>
       <view class="squat-popup-footer">
-        <view class="squat-popup-btn squat-popup-btn-reset" bindtap="resetSquatCount">重置</view>
-        <view class="squat-popup-btn squat-popup-btn-close" bindtap="closeSquatPopup">关闭</view>
+        <view class="squat-popup-btn squat-popup-btn-redeem {{isSquatRedeeming ? 'squat-popup-btn-disabled' : ''}}" bindtap="redeemSquatPoints">
+          {{isSquatRedeeming ? '兑换中...' : '兑换'}}
+        </view>
       </view>
     </view>
   </view>

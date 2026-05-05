@@ -185,3 +185,8 @@ interface RecordWinnerDTO {
   basePoints: number;
   winTypes: string[];
 }
+
+interface RedeemSquatRequest {
+  user_id: number;
+  squat_count: number;
+}

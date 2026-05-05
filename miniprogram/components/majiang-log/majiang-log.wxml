@@ -102,10 +102,10 @@
 
 
                         <view class="player-avatars">
-                            <image class="avatar-small" src="{{item.player1.avatar}}"/>
-                            <image class="avatar-small" src="{{item.player2.avatar}}"/>
-                            <image class="avatar-small" src="{{item.player3.avatar}}"/>
-                            <image class="avatar-small" src="{{item.player4.avatar}}"/>
+                            <image wx:if="{{item.player1.avatar}}" class="avatar-small" src="{{item.player1.avatar}}"/>
+                            <image wx:if="{{item.player2.avatar}}" class="avatar-small" src="{{item.player2.avatar}}"/>
+                            <image wx:if="{{item.player3.avatar}}" class="avatar-small" src="{{item.player3.avatar}}"/>
+                            <image wx:if="{{item.player4.avatar}}" class="avatar-small" src="{{item.player4.avatar}}"/>
                         </view>
                     </view>
 
