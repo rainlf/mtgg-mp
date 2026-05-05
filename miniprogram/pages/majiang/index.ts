@@ -245,7 +245,7 @@ Page({
       .then((dtos) => {
         const safeDtos = Array.isArray(dtos) ? dtos : []
         const avatars = wx.getStorageSync('avatars') || []
-        const validDtos = safeDtos.filter((dto: GameDTO) => Array.isArray(dto.players) && dto.players.length > 0)
+        const validDtos = safeDtos.filter((dto: GameDTO) => dto.type_code !== 6 && Array.isArray(dto.players) && dto.players.length > 0)
         const formattedList = validDtos.map((dto: GameDTO) => {
           const log = convertGameDTO(dto, currentUserId)
           if (avatars.length > 0) this.updateLogAvatars(log, avatars)
@@ -295,7 +295,7 @@ Page({
       .then((dtos) => {
         const safeDtos = Array.isArray(dtos) ? dtos : []
         const avatars = wx.getStorageSync('avatars') || []
-        const validDtos = safeDtos.filter((dto: GameDTO) => Array.isArray(dto.players) && dto.players.length > 0)
+        const validDtos = safeDtos.filter((dto: GameDTO) => dto.type_code === 6 && Array.isArray(dto.players) && dto.players.length > 0)
         const formattedList = validDtos.map((dto: GameDTO) => {
           const log = convertGameDTO(dto, currentUserId)
           if (avatars.length > 0) this.updateLogAvatars(log, avatars)
@@ -366,7 +366,7 @@ Page({
         }
         const safeDtos = Array.isArray(dtos) ? dtos : []
         const avatars = wx.getStorageSync('avatars') || []
-        const validDtos = safeDtos.filter((dto: GameDTO) => Array.isArray(dto.players) && dto.players.length > 0)
+        const validDtos = safeDtos.filter((dto: GameDTO) => dto.type_code !== 6 && Array.isArray(dto.players) && dto.players.length > 0)
         const formattedList = validDtos.map((dto: GameDTO) => {
           const log = convertGameDTO(dto, currentUserId)
           log.forOnePlayer = true
@@ -434,7 +434,7 @@ Page({
         }
         const safeDtos = Array.isArray(dtos) ? dtos : []
         const avatars = wx.getStorageSync('avatars') || []
-        const validDtos = safeDtos.filter((dto: GameDTO) => Array.isArray(dto.players) && dto.players.length > 0)
+        const validDtos = safeDtos.filter((dto: GameDTO) => dto.type_code === 6 && Array.isArray(dto.players) && dto.players.length > 0)
         const formattedList = validDtos.map((dto: GameDTO) => {
           const log = convertGameDTO(dto, currentUserId)
           log.forOnePlayer = true
