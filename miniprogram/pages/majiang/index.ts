@@ -1,5 +1,5 @@
 import { getUserInfo, getUserRank, updateUsername, uploadUserInfo } from '../../services/user-service'
-import { getGameList, getGameListByUser, cancelGame, preloadMajiangPlayers } from '../../services/majiang-service'
+import { getGameList, getGameListByUser, cancelGame, getPrizePool, preloadMajiangPlayers } from '../../services/majiang-service'
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
 
 Page({
@@ -15,6 +15,8 @@ Page({
     rankList: [] as User[],
     gameList: [] as MajiangLog[],
     userGameList: [] as MajiangLog[],
+    prizePoolInfo: null as PrizePoolDTO | null,
+    prizePoolLoading: false,
     historyTitle: '游戏历史',
     historyEmptyText: '',
     historyLoading: false,
@@ -110,7 +112,7 @@ Page({
     if (isLoadMore) {
       this.setData({ isLoadingMore: true })
     } else {
-      this.setData({ historyLoading: true })
+      this.setData({ historyLoading: true, prizePoolLoading: true })
     }
 
     const currentUserId = this.data.user ? this.data.user.id : 0
@@ -145,6 +147,10 @@ Page({
         })
         this.notifyComponentLoadMoreComplete()
       })
+
+    if (!isLoadMore) {
+      this.fetchPrizePoolInfo()
+    }
   },
 
   fetchUserInfo() {
@@ -167,6 +173,7 @@ Page({
       this.setData({
         currentUserId: userId,
         historyLoading: true,
+        prizePoolLoading: true,
       })
     }
 
@@ -221,6 +228,26 @@ Page({
         })
         this.notifyComponentLoadMoreComplete()
       })
+
+    if (!isLoadMore) {
+      this.fetchPrizePoolInfo()
+    }
+  },
+
+  fetchPrizePoolInfo() {
+    return getPrizePool()
+      .then((prizePoolInfo) => {
+        this.setData({
+          prizePoolInfo,
+          prizePoolLoading: false,
+        })
+      })
+      .catch((err) => {
+        console.error('获取奖池信息失败:', err)
+        this.setData({
+          prizePoolLoading: false,
+        })
+      })
   },
 
   // 更新对局记录中的头像
@@ -238,6 +265,7 @@ Page({
     log.winners.forEach((item) => updateAvatar(item.user))
     log.losers.forEach((item) => updateAvatar(item.user))
     if (log.recorder) updateAvatar(log.recorder.user)
+    if (log.jackpotEvent) updateAvatar(log.jackpotEvent.user)
   },
 
   // 通知子组件加载更多完成

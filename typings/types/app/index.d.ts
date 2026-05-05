@@ -43,16 +43,23 @@ interface MajiangLog {
   winners: MajiangLogItem[];
   losers: MajiangLogItem[];
   recorder: MajiangLogItem;
+  jackpotEvent?: MajiangJackpotEvent | null;
   deleteIcon: string;
   forOnePlayer: boolean;
   playerWin: boolean;
   remark: string;
 }
 
+interface MajiangJackpotEvent {
+  user: User;
+  points: number;
+}
+
 // 对局记录中的玩家条目
 interface MajiangLogItem {
   user: User;
   points: number;
+  poolContribution?: number;
   tags: string[];
 }
 
@@ -126,6 +133,41 @@ interface LoginResponse {
 interface PlayersResponse {
   current_players: UserDTO[];
   all_players: UserDTO[];
+}
+
+interface PrizePoolDTO {
+  pool_type: string;
+  balance: number;
+}
+
+interface PrizePoolContributorDTO {
+  user: UserDTO;
+  contributed_points: number;
+}
+
+interface PrizePoolJackpotEventDTO {
+  game_id: number;
+  user: UserDTO;
+  points: number;
+  created_at: string;
+}
+
+interface PrizePoolDetailDTO {
+  pool_type: string;
+  contributors: PrizePoolContributorDTO[];
+  jackpot_events: PrizePoolJackpotEventDTO[];
+}
+
+interface PrizePoolContributorItem {
+  user: User;
+  contributedPoints: number;
+}
+
+interface PrizePoolJackpotEventItem {
+  gameId: number;
+  user: User;
+  points: number;
+  createdTime: string;
 }
 
 // 记录对局请求

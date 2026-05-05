@@ -1,4 +1,5 @@
-import { deleteMajiangLog } from '../../services/majiang-service'
+import { deleteMajiangLog, getPrizePoolDetail } from '../../services/majiang-service'
+import { convertUserDTO } from '../../utils/util'
 
 Component({
   properties: {
@@ -22,15 +23,77 @@ Component({
       type: Boolean,
       value: true,
     },
+    prizePoolInfo: {
+      type: Object,
+      value: null,
+    },
+    prizePoolLoading: {
+      type: Boolean,
+      value: false,
+    },
   },
   data: {
     isRefreshing: false,
     isLoadingMore: false,
+    showPrizePoolDetail: false,
+    prizePoolDetailLoading: false,
+    prizePoolContributors: [] as PrizePoolContributorItem[],
+    prizePoolJackpotEvents: [] as PrizePoolJackpotEventItem[],
   },
 
   // 记录加载开始的时间戳，用于超时检测
   loadingStartTime: 0,
   methods: {
+    togglePrizePoolDetail() {
+      if (this.data.prizePoolLoading || !this.properties.prizePoolInfo) {
+        return
+      }
+
+      const nextShowPrizePoolDetail = !this.data.showPrizePoolDetail
+      this.setData({
+        showPrizePoolDetail: nextShowPrizePoolDetail,
+      })
+
+      if (nextShowPrizePoolDetail) {
+        this.loadPrizePoolDetail()
+      }
+    },
+
+    loadPrizePoolDetail() {
+      this.setData({
+        prizePoolDetailLoading: true,
+      })
+
+      return getPrizePoolDetail()
+        .then((detail) => {
+          const contributors = Array.isArray(detail?.contributors)
+            ? detail.contributors.map((item) => ({
+              user: convertUserDTO(item.user),
+              contributedPoints: item.contributed_points,
+            }))
+            : []
+          const jackpotEvents = Array.isArray(detail?.jackpot_events)
+            ? detail.jackpot_events.map((item) => ({
+              gameId: item.game_id,
+              user: convertUserDTO(item.user),
+              points: item.points,
+              createdTime: item.created_at,
+            }))
+            : []
+          this.setData({
+            prizePoolContributors: contributors,
+            prizePoolJackpotEvents: jackpotEvents,
+            prizePoolDetailLoading: false,
+          })
+        })
+        .catch((err) => {
+          console.error('获取奖池明细失败:', err)
+          this.setData({
+            prizePoolDetailLoading: false,
+          })
+        })
+    },
+
     onRefresh() {
       if (this.data.isRefreshing) {
         return

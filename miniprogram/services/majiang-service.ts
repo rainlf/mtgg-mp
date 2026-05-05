@@ -40,6 +40,20 @@ export const getPlayers = (): Promise<PlayersResponse> => {
   })
 }
 
+export const getPrizePool = (): Promise<PrizePoolDTO> => {
+  return request<PrizePoolDTO>({
+    url: '/api/game/prize-pool',
+    method: 'GET',
+  })
+}
+
+export const getPrizePoolDetail = (): Promise<PrizePoolDetailDTO> => {
+  return request<PrizePoolDetailDTO>({
+    url: '/api/game/prize-pool/detail',
+    method: 'GET',
+  })
+}
+
 const fetchMajiangPlayers = (): Promise<MajiangPlayers> => {
   return getPlayers().then((res) => ({
     currentPlayers: (res.current_players || []).map((item: UserDTO) => convertUserDTO(item)),

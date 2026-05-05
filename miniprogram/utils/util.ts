@@ -109,8 +109,16 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
   const recorder: MajiangLogItem = {
     user: recorderUser,
     points: recorderPlayer ? recorderPlayer.final_points : 0,
+    poolContribution: recorderPlayer ? recorderPlayer.base_points : 0,
     tags: [],
   }
+
+  const jackpotEvent: MajiangJackpotEvent | null = recorderPlayer && recorderPlayer.final_points > 0
+    ? {
+      user: recorderUser,
+      points: recorderPlayer.final_points,
+    }
+    : null
 
   // 删除图标：本人显示可删除图标，其他人显示灰色禁用图标
   const deleteIcon = (recorderUser.id === currentUserId) ? '/images/delete.png' : '/images/delete2.png'
@@ -133,6 +141,7 @@ export const convertGameDTO = (dto: GameDTO, currentUserId: number): MajiangLog 
     winners,
     losers,
     recorder,
+    jackpotEvent,
     deleteIcon,
     forOnePlayer: false,
     playerWin,

@@ -9,6 +9,65 @@
         <view class="panel-banner panel-banner-history">
             <text class="panel-banner__title">{{title}}</text>
         </view>
+        <view class="prize-pool-card" wx:if="{{prizePoolLoading || prizePoolInfo}}" bindtap="togglePrizePoolDetail">
+            <view class="prize-pool-card__header">
+                <text class="prize-pool-card__label">当前奖池</text>
+                <view class="prize-pool-card__header-right">
+                    <text class="prize-pool-card__type" wx:if="{{prizePoolInfo && prizePoolInfo.pool_type === 'recorder'}}">记录人奖池</text>
+                    <text class="prize-pool-card__action" wx:if="{{!prizePoolLoading}}">{{showPrizePoolDetail ? '收起' : '明细'}}</text>
+                </view>
+            </view>
+            <view class="prize-pool-card__body" wx:if="{{!prizePoolLoading && prizePoolInfo}}">
+                <text class="prize-pool-card__balance">{{prizePoolInfo.balance}}</text>
+                <text class="prize-pool-card__unit">金币</text>
+            </view>
+            <view class="prize-pool-card__loading" wx:if="{{prizePoolLoading}}">
+                <view class="loading-spinner prize-pool-card__spinner"></view>
+                <text class="prize-pool-card__hint">奖池信息加载中...</text>
+            </view>
+        </view>
+        <view class="prize-pool-detail" wx:if="{{showPrizePoolDetail}}">
+            <view class="prize-pool-detail__header">
+                <text class="prize-pool-detail__title">奖池明细</text>
+                <text class="prize-pool-detail__subtitle">累计入池与中奖记录</text>
+            </view>
+            <view class="prize-pool-detail__loading" wx:if="{{prizePoolDetailLoading}}">
+                <view class="loading-spinner prize-pool-detail__spinner"></view>
+                <text class="prize-pool-detail__hint">明细加载中...</text>
+            </view>
+            <view class="prize-pool-detail__empty" wx:if="{{!prizePoolDetailLoading && prizePoolContributors.length === 0 && prizePoolJackpotEvents.length === 0}}">
+                <text class="prize-pool-detail__hint">暂时还没有入池记录</text>
+            </view>
+            <block wx:if="{{!prizePoolDetailLoading && prizePoolContributors.length > 0}}">
+                <view class="prize-pool-detail__section-title">累计入池排行</view>
+                <view class="prize-pool-detail__row" wx:for="{{prizePoolContributors}}" wx:key="index">
+                    <view class="prize-pool-detail__user">
+                        <image class="prize-pool-detail__avatar" wx:if="{{item.user && item.user.avatar}}" src="{{item.user.avatar}}" mode="aspectFill"/>
+                        <view class="prize-pool-detail__avatar prize-pool-detail__avatar--placeholder" wx:else>
+                            <text class="prize-pool-detail__avatar-text">奖</text>
+                        </view>
+                        <text class="prize-pool-detail__name">{{item.user.username || item.user.nickname || '未命名用户'}}</text>
+                    </view>
+                    <text class="prize-pool-detail__points">+{{item.contributedPoints}}</text>
+                </view>
+            </block>
+            <block wx:if="{{!prizePoolDetailLoading && prizePoolJackpotEvents.length > 0}}">
+                <view class="prize-pool-detail__section-title prize-pool-detail__section-title--event">中奖记录</view>
+                <view class="prize-pool-detail__row prize-pool-detail__row--event" wx:for="{{prizePoolJackpotEvents}}" wx:key="index">
+                    <view class="prize-pool-detail__user prize-pool-detail__user--event">
+                        <image class="prize-pool-detail__avatar" wx:if="{{item.user && item.user.avatar}}" src="{{item.user.avatar}}" mode="aspectFill"/>
+                        <view class="prize-pool-detail__avatar prize-pool-detail__avatar--placeholder" wx:else>
+                            <text class="prize-pool-detail__avatar-text">中</text>
+                        </view>
+                        <view class="prize-pool-detail__event-meta">
+                            <text class="prize-pool-detail__name">{{item.user.username || item.user.nickname || '未命名用户'}}</text>
+                            <text class="prize-pool-detail__time">{{item.createdTime}}</text>
+                        </view>
+                    </view>
+                    <text class="prize-pool-detail__points prize-pool-detail__points--event">+{{item.points}}</text>
+                </view>
+            </block>
+        </view>
         <view wx:if="{{isInitialLoading && listData.length === 0}}" class="panel-loading">
             <view class="loading-spinner panel-loading__spinner"></view>
             <text class="panel-loading__text">加载中...</text>
@@ -52,7 +111,7 @@
                             <text
                                 class="recorder-info"
                                 wx:if="{{item.recorder && item.recorder.user && (item.recorder.user.username || item.recorder.user.nickname)}}"
-                            >记录人：{{item.recorder.user.username || item.recorder.user.nickname}}</text>
+                            >记录人：{{item.recorder.user.username || item.recorder.user.nickname}}<text class="recorder-pool-info" wx:if="{{item.recorder.poolContribution > 0}}"> 奖池 +{{item.recorder.poolContribution}}</text></text>
                             <text class="game-time">{{item.createdTime}}</text>
                         </view>
                         <image
@@ -64,6 +123,12 @@
                                 mode="widthFix"
                         />
                     </view>
+                </view>
+
+                <view class="jackpot-event" wx:if="{{item.jackpotEvent}}">
+                    <view class="jackpot-event__badge">奖池</view>
+                    <text class="jackpot-event__text">{{item.jackpotEvent.user.username || item.jackpotEvent.user.nickname}} 中奖了</text>
+                    <text class="jackpot-event__points">+{{item.jackpotEvent.points}}</text>
                 </view>
 
                 <!-- 赢家区域 -->

@@ -40,6 +40,250 @@
     color: #453f86;
 }
 
+.prize-pool-card {
+    margin: 0 0 18rpx;
+    padding: 20rpx 24rpx;
+    border-radius: 18rpx;
+    background: linear-gradient(135deg, rgba(255, 249, 234, 0.98) 0%, rgba(255, 243, 212, 0.98) 100%);
+    border: 1rpx solid rgba(229, 173, 61, 0.2);
+    box-shadow: 0 8rpx 18rpx rgba(224, 162, 40, 0.08);
+    box-sizing: border-box;
+}
+
+.prize-pool-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.prize-pool-card__header-right {
+    display: flex;
+    align-items: center;
+}
+
+.prize-pool-card__label {
+    font-size: 24rpx;
+    font-weight: 700;
+    color: #8f5b13;
+}
+
+.prize-pool-card__type {
+    padding: 6rpx 14rpx;
+    border-radius: 999rpx;
+    font-size: 20rpx;
+    line-height: 1;
+    color: #9e691d;
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.prize-pool-card__action {
+    margin-left: 10rpx;
+    font-size: 22rpx;
+    color: #b27b20;
+}
+
+.prize-pool-card__body,
+.prize-pool-card__loading {
+    display: flex;
+    align-items: flex-end;
+    margin-top: 14rpx;
+}
+
+.prize-pool-card__balance {
+    font-size: 44rpx;
+    line-height: 1;
+    font-weight: 700;
+    color: #c97800;
+}
+
+.prize-pool-card__unit {
+    margin-left: 10rpx;
+    font-size: 22rpx;
+    line-height: 1.2;
+    color: #9e691d;
+}
+
+.prize-pool-card__spinner {
+    width: 26rpx;
+    height: 26rpx;
+}
+
+.prize-pool-card__hint {
+    margin-left: 10rpx;
+    font-size: 22rpx;
+    color: #9e691d;
+}
+
+.prize-pool-detail {
+    margin: -6rpx 0 18rpx;
+    padding: 18rpx 22rpx;
+    border-radius: 16rpx;
+    background: rgba(255, 252, 243, 0.98);
+    border: 1rpx solid rgba(229, 173, 61, 0.14);
+    box-shadow: 0 6rpx 16rpx rgba(224, 162, 40, 0.06);
+    box-sizing: border-box;
+}
+
+.prize-pool-detail__header,
+.prize-pool-detail__loading,
+.prize-pool-detail__empty,
+.prize-pool-detail__row,
+.prize-pool-detail__user {
+    display: flex;
+    align-items: center;
+}
+
+.prize-pool-detail__header {
+    justify-content: space-between;
+    margin-bottom: 10rpx;
+}
+
+.prize-pool-detail__title {
+    font-size: 22rpx;
+    font-weight: 700;
+    color: #8f5b13;
+}
+
+.prize-pool-detail__section-title {
+    margin-top: 12rpx;
+    margin-bottom: 6rpx;
+    font-size: 20rpx;
+    font-weight: 700;
+    color: #9d6718;
+}
+
+.prize-pool-detail__section-title--event {
+    margin-top: 16rpx;
+}
+
+.prize-pool-detail__subtitle,
+.prize-pool-detail__hint {
+    font-size: 20rpx;
+    color: #af7d2f;
+}
+
+.prize-pool-detail__spinner {
+    width: 24rpx;
+    height: 24rpx;
+}
+
+.prize-pool-detail__loading,
+.prize-pool-detail__empty {
+    padding: 12rpx 0 6rpx;
+}
+
+.prize-pool-detail__hint {
+    margin-left: 10rpx;
+}
+
+.prize-pool-detail__row {
+    justify-content: space-between;
+    padding: 16rpx 0;
+}
+
+.prize-pool-detail__row + .prize-pool-detail__row {
+    border-top: 1rpx solid rgba(229, 173, 61, 0.12);
+}
+
+.prize-pool-detail__user {
+    min-width: 0;
+    flex: 1;
+}
+
+.prize-pool-detail__user--event {
+    align-items: flex-start;
+}
+
+.prize-pool-detail__avatar {
+    width: 50rpx;
+    height: 50rpx;
+    border-radius: 50%;
+    background: #fff;
+    flex-shrink: 0;
+}
+
+.prize-pool-detail__avatar--placeholder {
+    justify-content: center;
+    background: linear-gradient(180deg, rgba(255, 242, 204, 0.98) 0%, rgba(255, 225, 164, 0.98) 100%);
+}
+
+.prize-pool-detail__avatar-text {
+    font-size: 22rpx;
+    font-weight: 700;
+    color: #b67810;
+}
+
+.prize-pool-detail__name {
+    margin-left: 14rpx;
+    font-size: 24rpx;
+    color: #654214;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.prize-pool-detail__event-meta {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.prize-pool-detail__time {
+    margin-left: 14rpx;
+    margin-top: 6rpx;
+    font-size: 20rpx;
+    color: #aa8a5d;
+}
+
+.prize-pool-detail__points {
+    margin-left: 16rpx;
+    font-size: 26rpx;
+    font-weight: 700;
+    color: #d28600;
+    flex-shrink: 0;
+}
+
+.prize-pool-detail__points--event {
+    color: #c66b00;
+}
+
+.jackpot-event {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16rpx;
+    padding: 14rpx 18rpx;
+    border-radius: 16rpx;
+    background: linear-gradient(135deg, rgba(255, 249, 231, 0.98) 0%, rgba(255, 237, 192, 0.98) 100%);
+    border: 1rpx solid rgba(224, 171, 64, 0.2);
+}
+
+.jackpot-event__badge {
+    padding: 6rpx 14rpx;
+    border-radius: 999rpx;
+    font-size: 20rpx;
+    font-weight: 700;
+    color: #9d650d;
+    background: rgba(255, 255, 255, 0.66);
+}
+
+.jackpot-event__text {
+    flex: 1;
+    margin-left: 14rpx;
+    font-size: 24rpx;
+    color: #7a5115;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.jackpot-event__points {
+    margin-left: 12rpx;
+    font-size: 28rpx;
+    font-weight: 700;
+    color: #cf7b00;
+    flex-shrink: 0;
+}
+
 .panel-loading {
     display: flex;
     flex-direction: column;
@@ -183,6 +427,11 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.recorder-pool-info {
+    color: #c97800;
+    font-weight: 600;
 }
 
 .delete-btn {
