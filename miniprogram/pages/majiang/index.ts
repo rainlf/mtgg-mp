@@ -95,6 +95,14 @@ function getSquatSubmitCount(count: number) {
   return count
 }
 
+function getShareTitle(user?: User) {
+  const displayName = String(user?.nickname || user?.username || '').trim()
+  if (displayName) {
+    return `${displayName}邀请你来 Mango 健身麻将记分`
+  }
+  return '来 Mango 健身麻将，一起记分冲榜'
+}
+
 function mapFitnessUser(dto: UserDTO): User {
   const user = convertUserDTO(dto)
   user.fitnessPoints = dto.total_points || 0
@@ -153,6 +161,17 @@ Page({
   },
 
   onLoad() {
+  },
+
+  buildShareMessage() {
+    return {
+      title: getShareTitle(this.data.user),
+      path: '/pages/majiang/index',
+    }
+  },
+
+  onShareAppMessage() {
+    return this.buildShareMessage()
   },
 
   onShow() {
