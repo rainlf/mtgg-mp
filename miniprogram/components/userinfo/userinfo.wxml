@@ -22,6 +22,10 @@
             <text class="points">{{points}}</text>
           </view>
 
+          <view class="shop-entry" catch:tap="onShopClick">
+            <text class="shop-entry__label">商店</text>
+          </view>
+
           <view class="settings-btn" catch:tap="onSettingsClick">
             <image class="gear-icon" src="/images/gears.png" />
           </view>

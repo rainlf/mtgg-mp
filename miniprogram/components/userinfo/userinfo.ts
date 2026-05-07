@@ -1,3 +1,5 @@
+declare const wx: any
+
 Component({
   properties: {
     username: {
@@ -33,6 +35,7 @@ Component({
 
   observers: {
     'winRate,totalGames,winCount'(winRate: number, totalGames: number, winCount: number) {
+      const self = this as any
       let normalizedRate = Number(winRate) || 0
       const isNegativeRate = normalizedRate < 0
 
@@ -48,7 +51,7 @@ Component({
       const percentage = safeRate * 100
       const winRateText =
         percentage % 1 === 0 ? `${percentage.toFixed(0)}%` : `${percentage.toFixed(1)}%`
-      this.setData({
+      self.setData({
         winRateText,
         winRateNegative: percentage < 0,
       })
@@ -57,7 +60,14 @@ Component({
 
   methods: {
     onSettingsClick() {
-      this.triggerEvent('settingsclick')
+      const self = this as any
+      self.triggerEvent('settingsclick')
+    },
+    onShopClick() {
+      wx.showToast({
+        title: '正在建设中，请股东们稍稍等待...',
+        icon: 'none',
+      })
     },
   },
 })
