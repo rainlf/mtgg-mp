@@ -1,5 +1,6 @@
 import { uploadUserInfo } from '../../services/user-service'
 import { getUserInfo } from '../../services/user-service'
+import { setCurrentUserId } from '../../services/request-service'
 import { convertUserDTO } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
@@ -16,6 +17,7 @@ Page({
   onLoad() {
     const user = wx.getStorageSync('user')
     if (user) {
+      setCurrentUserId(user.id)
       this.setData({ user })
     }
   },
@@ -61,6 +63,7 @@ Page({
       .then((userDTO) => {
         const user = convertUserDTO(userDTO)
         wx.setStorageSync('user', user)
+        setCurrentUserId(user.id)
         wx.hideLoading()
         wx.redirectTo({ url: '../majiang/index' })
       })

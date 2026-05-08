@@ -1,5 +1,6 @@
 import { getUserInfo, getUserRank, getFitnessRank, updateUsername, uploadUserInfo } from '../../services/user-service'
 import { getGameList, getGameListByUser, getFitnessList, getFitnessListByUser, cancelGame, getPrizePool, preloadMajiangPlayers, redeemSquat } from '../../services/majiang-service'
+import { setCurrentUserId } from '../../services/request-service'
 import { convertUserDTO, convertGameDTO, updateAvatarFromCache } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
@@ -177,6 +178,7 @@ Page({
   onShow() {
     const user: User = wx.getStorageSync('user')
     if (user) {
+      setCurrentUserId(user.id)
       this.setData({ user })
     }
 
@@ -384,6 +386,7 @@ Page({
       .then((dto) => {
         const updatedUser = convertUserDTO(dto)
         wx.setStorageSync('user', updatedUser)
+        setCurrentUserId(updatedUser.id)
         this.setData({ user: updatedUser })
       })
       .catch((err) => {
@@ -999,6 +1002,7 @@ Page({
       .then((dto) => {
         const updatedUser = convertUserDTO(dto)
         wx.setStorageSync('user', updatedUser)
+        setCurrentUserId(updatedUser.id)
         this.setData({
           user: updatedUser,
           isProfileSaving: false,

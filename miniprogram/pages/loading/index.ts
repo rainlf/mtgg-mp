@@ -1,4 +1,5 @@
 import { login, getUserInfo } from '../../services/user-service'
+import { setCurrentUserId } from '../../services/request-service'
 import { convertUserDTO } from '../../utils/util'
 
 Page({
@@ -32,11 +33,13 @@ Page({
           login(res.code)
             .then((loginRes) => {
               const userId = loginRes.user_id
+              setCurrentUserId(userId)
               return getUserInfo(userId)
             })
             .then((userDTO) => {
               const user = convertUserDTO(userDTO)
               wx.setStorageSync('user', user)
+              setCurrentUserId(user.id)
               this.setData({ progress: 100, loadingText: '加载完成' })
               setTimeout(() => {
                 if (user.avatar && user.nickname) {

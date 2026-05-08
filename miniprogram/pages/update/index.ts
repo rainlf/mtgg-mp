@@ -1,4 +1,5 @@
 import { uploadUserInfo, updateUsername, getUserInfo } from '../../services/user-service'
+import { setCurrentUserId } from '../../services/request-service'
 import { convertUserDTO } from '../../utils/util'
 import { getTrimmedNickname, normalizeNicknameInput, validateNickname } from '../../utils/nickname'
 
@@ -13,6 +14,7 @@ Page({
   onLoad() {
     const user = wx.getStorageSync('user')
     if (user) {
+      setCurrentUserId(user.id)
       this.setData({
         user,
         nickname: user.nickname || user.username || '',
@@ -61,6 +63,7 @@ Page({
       .then((userDTO) => {
         const updatedUser = convertUserDTO(userDTO)
         wx.setStorageSync('user', updatedUser)
+        setCurrentUserId(updatedUser.id)
         this.setData({ user: updatedUser })
         wx.hideLoading()
         wx.showToast({ title: '保存成功', icon: 'success' })

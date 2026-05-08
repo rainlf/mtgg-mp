@@ -1,4 +1,13 @@
-import { request, getServer } from './request-service'
+import { request, getServer, getCurrentUserId } from './request-service'
+
+const buildUserHeader = (header?: Record<string, string>): Record<string, string> => {
+  const mergedHeader: Record<string, string> = { ...(header || {}) }
+  const userId = getCurrentUserId()
+  if (userId && !mergedHeader['X-User-ID']) {
+    mergedHeader['X-User-ID'] = String(userId)
+  }
+  return mergedHeader
+}
 
 // 登录：返回 { user_id }，需要再调 getUserInfo 获取完整信息
 export const login = (code: string): Promise<LoginResponse> => {
@@ -41,7 +50,7 @@ export const updateUsername = (userId: number, nickname: string): Promise<any> =
     wx.request({
       url: `${server}/api/user/update`,
       method: 'POST',
-      header: { 'content-type': 'application/x-www-form-urlencoded' },
+      header: buildUserHeader({ 'content-type': 'application/x-www-form-urlencoded' }),
       data: `userId=${userId}&nickname=${encodeURIComponent(nickname)}`,
       success: (res) => {
         const response = res.data as any
@@ -64,6 +73,7 @@ export const uploadUserInfo = (userId: number, nickname: string, avatarPath: str
       url: `${server}/api/user/update`,
       filePath: avatarPath,
       name: 'avatar',
+      header: buildUserHeader(),
       formData: {
         userId: String(userId),
         nickname: nickname,
