@@ -111,36 +111,6 @@ page {
   box-sizing: border-box;
 }
 
-.quick-actions {
-  margin: 10rpx 20rpx 0;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.quick-action-btn {
-  min-width: 220rpx;
-  min-height: 68rpx;
-  padding: 0 28rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 999rpx;
-  font-size: 26rpx;
-  font-weight: 700;
-  line-height: 1;
-  box-sizing: border-box;
-}
-
-.quick-action-btn::after {
-  border: none;
-}
-
-.quick-action-btn-share {
-  color: #fff;
-  background: linear-gradient(135deg, #ffcf5d 0%, #ff9f1a 100%);
-  box-shadow: 0 8rpx 18rpx rgba(255, 159, 26, 0.2);
-}
-
 .bottom-container {
   /* 放在页面容器内绝对定位，避免 viewport fixed 在 Skyline 真机上的不稳定表现。 */
   position: absolute;

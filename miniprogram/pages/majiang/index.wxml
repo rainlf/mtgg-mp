@@ -29,12 +29,6 @@
         bind:settingsclick="openProfileEditor"
       />
 
-      <view class="quick-actions">
-        <button class="quick-action-btn quick-action-btn-share" open-type="share">
-          分享给好友
-        </button>
-      </view>
-
       <block wx:if="{{showUserRank}}">
         <rank
           class="content-panel"
