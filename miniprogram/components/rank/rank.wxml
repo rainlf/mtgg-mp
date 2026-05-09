@@ -24,7 +24,7 @@
                 </view>
             </view>
             <view wx:if="{{rankScene !== 'fitness'}}" class="panel-banner__worst">
-                <text class="panel-banner__worst-title">全场最菜🥬 居然是👉</text>
+                <text class="panel-banner__worst-title">全场最菜🥬 居然是Ta👉</text>
                 <block wx:if="{{worstUser}}">
                     <view class="panel-banner__worst-user">
                         <image class="panel-banner__worst-avatar" src="{{worstUser.avatar}}" mode="aspectFill" />

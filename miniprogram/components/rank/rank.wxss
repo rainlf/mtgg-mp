@@ -60,7 +60,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 12rpx;
+    padding: 0 10rpx;
     border-radius: 12rpx;
     background: rgba(255, 255, 255, 0.62);
     box-sizing: border-box;
@@ -68,8 +68,8 @@
 
 .panel-banner__worst-title {
     flex-shrink: 0;
-    margin-right: 14rpx;
-    font-size: 24rpx;
+    margin-right: 10rpx;
+    font-size: 22rpx;
     font-weight: 700;
     color: #2f8f5b;
 }
@@ -79,21 +79,22 @@
     min-width: 0;
     display: flex;
     align-items: center;
-    margin-right: 14rpx;
+    margin-right: 10rpx;
 }
 
 .panel-banner__worst-avatar {
-    width: 36rpx;
-    height: 36rpx;
-    margin-right: 12rpx;
+    width: 32rpx;
+    height: 32rpx;
+    margin-right: 8rpx;
     border-radius: 50%;
     border: 2rpx solid rgba(255, 255, 255, 0.95);
     flex-shrink: 0;
 }
 
 .panel-banner__worst-name {
+    flex: 1;
     min-width: 0;
-    font-size: 24rpx;
+    font-size: 22rpx;
     font-weight: 600;
     color: #2d6f4f;
     white-space: nowrap;
@@ -108,7 +109,7 @@
 }
 
 .panel-banner__worst-metric + .panel-banner__worst-metric {
-    margin-left: 10rpx;
+    margin-left: 8rpx;
 }
 
 .panel-banner__worst-metric {
@@ -118,14 +119,14 @@
 }
 
 .panel-banner__worst-value {
-    font-size: 24rpx;
+    font-size: 22rpx;
     font-weight: 700;
     color: #2f8f5b;
 }
 
 .panel-banner__worst-label {
-    margin-left: 4rpx;
-    font-size: 20rpx;
+    margin-left: 2rpx;
+    font-size: 18rpx;
     color: #5e8f74;
 }
 
