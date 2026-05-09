@@ -71,9 +71,9 @@
 }
 
 .identity-block {
-  flex: 0 0 152rpx;
-  width: 152rpx;
-  min-width: 152rpx;
+  flex: 1;
+  width: auto;
+  min-width: 0;
   display: flex;
   align-items: center;
   min-height: 80rpx;
@@ -95,7 +95,7 @@
 .points-box {
   width: auto;
   min-width: 198rpx;
-  margin-left: 10rpx;
+  margin-left: auto;
   height: 72rpx;
   padding: 0 14rpx 0 12rpx;
   border-radius: 14rpx;
@@ -296,8 +296,8 @@
 }
 
 .settings-btn {
-  width: 44rpx;
-  height: 44rpx;
+  width: 64rpx;
+  height: 64rpx;
   margin-left: 8rpx;
   border-radius: 12rpx;
 }
