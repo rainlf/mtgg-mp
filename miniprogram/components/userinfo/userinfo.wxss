@@ -79,7 +79,7 @@
 }
 
 .username {
-  font-size: 40rpx;
+  font-size: 36rpx;
   font-weight: 700;
   color: #1f2f45;
   line-height: 1.1;
@@ -90,11 +90,11 @@
 }
 
 .points-box {
-  width: 248rpx;
-  max-width: 42%;
-  margin-left: 20rpx;
+  width: 208rpx;
+  max-width: 36%;
+  margin-left: 12rpx;
   height: 80rpx;
-  padding: 0 21rpx;
+  padding: 0 16rpx;
   border-radius: 13rpx;
   background: linear-gradient(135deg, rgba(255, 251, 242, 0.98) 0%, rgba(255, 240, 204, 0.98) 100%);
   border: 1rpx solid rgba(255, 183, 77, 0.24);
@@ -110,10 +110,10 @@
 }
 
 .shop-entry {
-  width: 80rpx;
-  height: 80rpx;
-  margin-left: 12rpx;
-  border-radius: 16rpx;
+  width: 68rpx;
+  height: 68rpx;
+  margin-left: 8rpx;
+  border-radius: 14rpx;
   background: linear-gradient(135deg, #fff5fb 0%, #ffe6f3 100%);
   border: 1rpx solid rgba(228, 124, 170, 0.2);
   display: flex;
@@ -133,7 +133,7 @@
 }
 
 .shop-entry__label {
-  font-size: 20rpx;
+  font-size: 18rpx;
   line-height: 1.1;
   font-weight: 600;
   color: #b04d78;
@@ -169,7 +169,7 @@
 
 .points-label {
   margin-left: 8rpx;
-  font-size: 25rpx;
+  font-size: 22rpx;
   color: #7d6546;
   line-height: 1.15;
   font-weight: 500;
@@ -178,8 +178,8 @@
 }
 
 .points {
-  margin-left: 10rpx;
-  font-size: 44rpx;
+  margin-left: 8rpx;
+  font-size: 36rpx;
   color: #ff9900;
   font-weight: 700;
   line-height: 1;
@@ -284,9 +284,16 @@
   text-align: center;
 }
 
+.settings-btn {
+  width: 48rpx;
+  height: 48rpx;
+  margin-left: 8rpx;
+  border-radius: 14rpx;
+}
+
 .gear-icon {
-  width: 28rpx;
-  height: 28rpx;
+  width: 24rpx;
+  height: 24rpx;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
