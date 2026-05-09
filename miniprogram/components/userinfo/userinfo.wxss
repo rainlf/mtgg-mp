@@ -71,14 +71,17 @@
 }
 
 .identity-block {
-  flex: 1;
-  min-width: 0;
+  flex: 0 0 152rpx;
+  width: 152rpx;
+  min-width: 152rpx;
   display: flex;
   align-items: center;
   min-height: 80rpx;
 }
 
 .username {
+  display: block;
+  width: 100%;
   font-size: 36rpx;
   font-weight: 700;
   color: #1f2f45;
@@ -90,18 +93,19 @@
 }
 
 .points-box {
-  width: 208rpx;
-  max-width: 36%;
-  margin-left: 12rpx;
+  width: auto;
+  min-width: 220rpx;
+  margin-left: 10rpx;
   height: 80rpx;
-  padding: 0 16rpx;
+  padding: 0 14rpx;
   border-radius: 13rpx;
   background: linear-gradient(135deg, rgba(255, 251, 242, 0.98) 0%, rgba(255, 240, 204, 0.98) 100%);
   border: 1rpx solid rgba(255, 183, 77, 0.24);
   display: flex;
   flex-direction: row;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  column-gap: 10rpx;
   flex-shrink: 0;
   box-sizing: border-box;
   box-shadow:
@@ -110,10 +114,10 @@
 }
 
 .shop-entry {
-  width: 68rpx;
-  height: 68rpx;
+  width: 64rpx;
+  height: 64rpx;
   margin-left: 8rpx;
-  border-radius: 14rpx;
+  border-radius: 12rpx;
   background: linear-gradient(135deg, #fff5fb 0%, #ffe6f3 100%);
   border: 1rpx solid rgba(228, 124, 170, 0.2);
   display: flex;
@@ -133,7 +137,7 @@
 }
 
 .shop-entry__label {
-  font-size: 18rpx;
+  font-size: 17rpx;
   line-height: 1.1;
   font-weight: 600;
   color: #b04d78;
@@ -142,12 +146,13 @@
 .points-meta {
   display: flex;
   align-items: center;
-  min-width: 0;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .coin-icon {
-  width: 24rpx;
-  height: 24rpx;
+  width: 22rpx;
+  height: 22rpx;
   border-radius: 50%;
   background: linear-gradient(135deg, #ffd66b 0%, #ffb300 100%);
   border: 1rpx solid rgba(214, 144, 0, 0.35);
@@ -161,24 +166,27 @@
 }
 
 .coin-icon-inner {
-  width: 10rpx;
-  height: 10rpx;
+  width: 8rpx;
+  height: 8rpx;
   border-radius: 50%;
   background: rgba(255, 241, 196, 0.75);
 }
 
 .points-label {
-  margin-left: 8rpx;
+  display: flex;
+  align-items: center;
+  margin-left: 6rpx;
   font-size: 22rpx;
   color: #7d6546;
-  line-height: 1.15;
+  line-height: 1;
   font-weight: 500;
   opacity: 0.92;
   white-space: nowrap;
 }
 
 .points {
-  margin-left: 8rpx;
+  display: flex;
+  align-items: center;
   font-size: 36rpx;
   color: #ff9900;
   font-weight: 700;
@@ -285,15 +293,15 @@
 }
 
 .settings-btn {
-  width: 48rpx;
-  height: 48rpx;
+  width: 44rpx;
+  height: 44rpx;
   margin-left: 8rpx;
-  border-radius: 14rpx;
+  border-radius: 12rpx;
 }
 
 .gear-icon {
-  width: 24rpx;
-  height: 24rpx;
+  width: 22rpx;
+  height: 22rpx;
   transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
